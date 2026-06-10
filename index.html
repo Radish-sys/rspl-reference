@@ -710,7 +710,21 @@ document.addEventListener('drop',e=>{
   const r=new FileReader(); r.onload=ev=>loadJSON(ev.target.result); r.readAsText(f);
 });
 
-render(BAKED_DATA);
+// ── AUTO-LOAD overrides.json ──────────────────────────────────────────────
+(async () => {
+  try {
+    const res = await fetch('overrides.json?_=' + Date.now());
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Object.keys(data).length > 0) {
+        currentData = data;
+        render(data);
+        return;
+      }
+    }
+  } catch(e) { /* no overrides.json or fetch failed, use baked data */ }
+  render(BAKED_DATA);
+})();
 
 // ── EDITOR PANEL ──────────────────────────────────────────────────────────
 let editingBP = null;
