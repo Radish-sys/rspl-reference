@@ -96,6 +96,7 @@ const WEAPON_ICONS = {
   "BP_Firearm_M870": "icons/T_UI_Icon_Weapon_870.png",
   "BP_Firearm_WCXSPEARTL": "icons/T_UI_Icon_Weapon_WCXSpearLT.png",
   "BP_Firearm_STG44": "icons/T_UI_Icon_Weapon_AK74.png",
+  "BP_Firearm_BerettaAR7090": "icons/T_UI_Icon_Weapon_BerettaAR7090.png",
 };
 
 const GRENADE_ICONS = {
