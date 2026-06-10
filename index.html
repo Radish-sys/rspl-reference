@@ -733,8 +733,8 @@ let editingBP = null;
 function buildIconGrid(selectedKey){
   const allIcons={...WEAPON_ICONS,...GRENADE_ICONS,...CLASS_ICONS,...FACTION_ICONS};
   document.getElementById('ep-icon-grid').innerHTML=Object.entries(allIcons)
-    .filter(([,v])=>v&&v.startsWith('data:'))
-    .map(([k,v])=>`<button class="ep-icon-btn${k===selectedKey?' selected':''}" data-key="${k}" onclick="selectIcon('${k}')" title="${k}"><img src="${v}" loading="lazy"></button>`)
+    .filter(([,v])=>v&&v!==null)
+    .map(([k,v])=>`<button class="ep-icon-btn${k===selectedKey?' selected':''}" data-key="${k}" onclick="selectIcon('${k}')" title="${k}"><img src="${v}" loading="lazy" style="mix-blend-mode:screen"></button>`)
     .join('');
 }
 
