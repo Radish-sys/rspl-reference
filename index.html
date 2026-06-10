@@ -48,8 +48,7 @@ nav{display:flex;height:100%;margin-left:8px;flex-shrink:0}
 .weapon-table td{padding:5px 8px;border-bottom:1px solid #111;vertical-align:middle}
 .weapon-table tr:hover td{background:#141414}
 .weapon-table tr:last-child td{border-bottom:none}
-tr.dim-row td:not(.wn){opacity:.45}tr.dim-row:hover td:not(.wn){opacity:.75}
-.wi,.wicon,.gi,.cls-icon,.tab-icon,.faction-icon{mix-blend-mode:screen}
+tr.dim-row td{opacity:.45}tr.dim-row:hover td{opacity:.75}
 tr.section-sep td{background:var(--s2);color:var(--dim);font-family:var(--mono);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;padding:4px 8px;border-top:1px solid var(--b1)}
 td.wn{display:flex;align-items:center;gap:6px;white-space:nowrap}
 .wi{height:18px;width:auto;max-width:56px;object-fit:contain;opacity:.6;flex-shrink:0;transition:opacity .12s}
@@ -211,6 +210,18 @@ td.flags{padding:7px 14px}
 .ep-del:hover{color:#c0392b}
 #edit-panel-bg{display:none;position:fixed;inset:0;z-index:199}
 #edit-panel.open ~ #edit-panel-bg{display:block}
+
+#push-confirm{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;align-items:center;justify-content:center;}
+#push-confirm.show{display:flex;}
+#push-confirm-box{background:#161616;border:1px solid #2a2a2a;border-radius:6px;padding:24px 28px;min-width:320px;font-family:'JetBrains Mono',monospace;}
+#push-confirm-box h3{font-size:13px;font-weight:600;margin-bottom:8px;color:#d0d0d0;}
+#push-confirm-box p{font-size:11px;color:#555;margin-bottom:16px;line-height:1.6;}
+#push-confirm-box .btn-row{display:flex;gap:8px;justify-content:flex-end;}
+#push-confirm-box button{background:var(--s2);border:1px solid var(--b2);color:var(--dim);padding:5px 14px;border-radius:3px;cursor:pointer;font-size:10px;font-family:'JetBrains Mono',monospace;transition:all .12s;}
+#push-confirm-box button:hover{color:var(--text);border-color:#555;}
+#push-confirm-box button.primary{background:#1a3a1a;border-color:#2a5a2a;color:#4a9a4a;}
+#push-confirm-box button.primary:hover{background:#1e451e;color:#5ab05a;}
+#push-status{font-size:10px;margin-top:10px;color:#555;text-align:right;min-height:14px;}
 </style>
 </head>
 <body>
@@ -225,7 +236,10 @@ td.flags{padding:7px 14px}
     <div class="tab" onclick="showPage('ammo')">Ammo</div>
     <div class="tab" onclick="showPage('damage')">Damage</div>
   </nav>
-  <button class="update-btn" onclick="document.getElementById('fileinput').click()">↑ Update Data</button>
+  <div id="admin-btns" style="display:flex;gap:8px;margin-left:auto;flex-shrink:0">
+    <button class="update-btn" onclick="document.getElementById('fileinput').click()">↑ Load JSON</button>
+    <button id="push-btn" style="display:none" class="update-btn" onclick="confirmPush()">⬆ Push to GitHub</button>
+  </div>
 </header>
 
 <div class="main">
@@ -319,8 +333,6 @@ td.flags{padding:7px 14px}
 <script src="icons.js"></script>
 <script src="data.js"></script>
 <script>
-const IS_ADMIN = new URLSearchParams(window.location.search).get('admin') === 'rspl2admin';
-if(!IS_ADMIN){ document.addEventListener('DOMContentLoaded',()=>{ ['edit-panel','edit-panel-bg'].forEach(id=>{const el=document.getElementById(id);if(el)el.remove();}); const ub=document.querySelector('.update-btn');if(ub)ub.remove(); }); }
 
 
 
@@ -666,6 +678,7 @@ function loadJSON(text){
     const btn=document.querySelector('.update-btn');
     btn.textContent='✕ Clear diff';
     btn.onclick=clearDiff;
+    if(IS_ADMIN) document.getElementById('push-btn').style.display='inline-block';
   }catch(e){ alert('Invalid JSON: '+e.message); }
 }
 
@@ -673,7 +686,8 @@ function clearDiff(){
   diffActive=false; currentData=BAKED_DATA;
   render(BAKED_DATA);
   const btn=document.querySelector('.update-btn');
-  btn.textContent='↑ Update Data';
+  btn.textContent='↑ Load JSON';
+  document.getElementById('push-btn').style.display='none';
   btn.onclick=()=>document.getElementById('fileinput').click();
   document.getElementById('diff-bar')?.remove();
 }
@@ -719,7 +733,7 @@ function filterIcons(q){
 
 function getSelectedIcon(){ const b=document.querySelector('.ep-icon-btn.selected'); return b?b.dataset.key:null; }
 
-function openEditPanel(bp){ if(!IS_ADMIN) return;
+function openEditPanel(bp){
   editingBP=bp;
   const ov=WO[bp]||{};
   document.getElementById('ep-title').textContent=bp.replace('BP_Firearm_','').replace('BP_Grenade_','');
@@ -856,6 +870,73 @@ function positionTooltip(e) {
 function hideAmmoTooltip() { tt.style.display = 'none'; }
 document.addEventListener('mousemove', e => { if (tt.style.display !== 'none') positionTooltip(e); });
 
+
+// ── GITHUB PUSH ───────────────────────────────────────────────────────────
+const GH_REPO  = 'Radish-sys/rspl-reference';
+const GH_FILE  = 'overrides.json';
+const GH_BRANCH = 'main';
+
+function getToken(){
+  let t = localStorage.getItem('gh_pat');
+  if(!t){
+    t = prompt('Enter your GitHub Personal Access Token:');
+    if(t) localStorage.setItem('gh_pat', t.trim());
+  }
+  return t ? t.trim() : null;
+}
+
+function confirmPush(){
+  document.getElementById('push-confirm').classList.add('show');
+  document.getElementById('push-status').textContent = '';
+}
+
+async function doPush(){
+  const token = getToken();
+  if(!token){ alert('No token provided.'); return; }
+
+  const status = document.getElementById('push-status');
+  status.textContent = 'Working...';
+  status.style.color = '#555';
+
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(currentData, null, 2))));
+  const apiBase = `https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`;
+
+  try {
+    // Get current SHA if file exists (required for update)
+    let sha = null;
+    const getRes = await fetch(`${apiBase}?ref=${GH_BRANCH}`, {
+      headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json' }
+    });
+    if(getRes.ok){ const j = await getRes.json(); sha = j.sha; }
+
+    const body = {
+      message: `chore: update ${GH_FILE} via RSPL2 admin panel`,
+      content,
+      branch: GH_BRANCH,
+      ...(sha ? { sha } : {})
+    };
+
+    const putRes = await fetch(apiBase, {
+      method: 'PUT',
+      headers: { Authorization: `token ${token}`, Accept: 'application/vnd.github.v3+json', 'Content-Type': 'application/json' },
+      body: JSON.stringify(body)
+    });
+
+    if(putRes.ok){
+      status.textContent = '✓ Pushed successfully';
+      status.style.color = '#4a9a4a';
+    } else {
+      const err = await putRes.json();
+      status.textContent = '✕ ' + (err.message || 'Unknown error');
+      status.style.color = '#c03030';
+      if(putRes.status === 401){ localStorage.removeItem('gh_pat'); status.textContent += ' — token cleared, try again'; }
+    }
+  } catch(e){
+    status.textContent = '✕ Network error: ' + e.message;
+    status.style.color = '#c03030';
+  }
+}
+
 </script>
 
 <div id="edit-panel">
@@ -906,5 +987,17 @@ document.addEventListener('mousemove', e => { if (tt.style.display !== 'none') p
   </div>
 </div>
 <div id="edit-panel-bg" onclick="closeEditPanel()"></div>
+
+<div id="push-confirm">
+  <div id="push-confirm-box">
+    <h3>Push to GitHub</h3>
+    <p>This will commit the loaded JSON as <code>overrides.json</code> to your repo.<br>All users will see the updated data immediately.</p>
+    <div id="push-status"></div>
+    <div class="btn-row">
+      <button onclick="document.getElementById('push-confirm').classList.remove('show')">Cancel</button>
+      <button class="primary" onclick="doPush()">Confirm Push</button>
+    </div>
+  </div>
+</div>
 </body>
 </html>
