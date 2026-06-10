@@ -223,6 +223,50 @@ td.flags{padding:7px 14px}
 #push-confirm-box button.primary{background:#1a3a1a;border-color:#2a5a2a;color:#4a9a4a;}
 #push-confirm-box button.primary:hover{background:#1e451e;color:#5ab05a;}
 #push-status{font-size:10px;margin-top:10px;color:#555;text-align:right;min-height:14px;}
+
+/* ── WEAPON DETAIL MODAL ────────────────────────────────────────────────── */
+#wdm-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);align-items:center;justify-content:center}
+#wdm-overlay.open{display:flex}
+#wdm-box{position:relative;display:flex;max-width:920px;width:95vw;max-height:90vh;background:#111;border:1px solid #1e1e1e;border-radius:4px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.8)}
+#wdm-stats{flex:1;min-width:0;overflow-y:auto;padding:24px 28px;border-right:1px solid #1a1a1a}
+#wdm-edit{width:300px;flex-shrink:0;overflow-y:auto;background:#0d0d0d}
+#wdm-close{position:absolute;top:12px;right:12px;background:none;border:none;color:#444;font-size:16px;cursor:pointer;z-index:10;padding:4px 8px;line-height:1}
+#wdm-close:hover{color:#aaa}
+.wdm-header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
+.wdm-icon{width:64px;height:40px;object-fit:contain;mix-blend-mode:screen;flex-shrink:0}
+.wdm-icon-ph{width:64px;height:40px;flex-shrink:0}
+.wdm-title{font-size:18px;font-weight:700;color:#e0e0e0;letter-spacing:.5px}
+.wdm-sub{font-size:11px;color:#444;font-family:'JetBrains Mono',monospace;margin-top:3px}
+.wdm-ammo-banner{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:3px;margin-bottom:18px}
+.wdm-ammo-name{font-size:12px;font-weight:600;color:#bbb;font-family:'JetBrains Mono',monospace}
+.wdm-ammo-mv{font-size:11px;color:#444;font-family:'JetBrains Mono',monospace;margin-left:auto}
+.wdm-dmg-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#1a1a1a;border:1px solid #1a1a1a;border-radius:3px;margin-bottom:16px;overflow:hidden}
+.wdm-dmg-cell{background:#0d0d0d;padding:12px 14px}
+.wdm-dmg-label{font-size:10px;color:#444;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
+.wdm-dmg-val{font-size:26px;font-weight:700;color:#e0e0e0;font-family:'JetBrains Mono',monospace;line-height:1}
+.wdm-bar-wrap{margin-bottom:18px}
+.wdm-bar-label{font-size:10px;color:#333;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;display:flex;justify-content:space-between}
+.wdm-bar-label span:last-child{color:#666}
+.wdm-bar-bg{height:4px;background:#1a1a1a;border-radius:2px;overflow:hidden}
+.wdm-bar-fill{height:100%;border-radius:2px;background:var(--accent);transition:width .3s ease}
+.wdm-rows{margin-bottom:18px}
+.wdm-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #111}
+.wdm-row:last-child{border-bottom:none}
+.wdm-row-label{font-size:11px;color:#555}
+.wdm-row-val{font-size:11px;color:#bbb;font-family:'JetBrains Mono',monospace;font-weight:600}
+.wdm-row-val.good{color:#4caf50}
+.wdm-row-val.warn{color:#f39c12}
+.wdm-row-val.bad{color:#e74c3c}
+.wdm-section-title{font-size:10px;color:#2a2a2a;text-transform:uppercase;letter-spacing:.8px;margin:16px 0 8px;font-family:'JetBrains Mono',monospace}
+.wdm-reload-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
+.wdm-reload-cell{background:#0a0a0a;border:1px solid #161616;border-radius:3px;padding:8px 10px}
+.wdm-reload-type{font-size:9px;color:#333;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
+.wdm-reload-val{font-size:13px;font-weight:700;color:#888;font-family:'JetBrains Mono',monospace}
+.wdm-ammo-tags{display:flex;flex-wrap:wrap;gap:5px}
+.wdm-ammo-chip{font-size:9px;font-family:'JetBrains Mono',monospace;padding:2px 6px;border:1px solid #222;border-radius:2px;color:#444}
+/* edit panel inside modal — reuse existing ep styles, no position:fixed */
+#wdm-edit #edit-panel{position:static;width:100%;height:100%;right:auto;border-left:none;box-shadow:none;display:flex;flex-direction:column}
+#wdm-edit #edit-panel.open{right:auto}
 </style>
 </head>
 <body>
@@ -428,7 +472,7 @@ function weaponRow(w, wi, dim) {
   const ammoColor = AMMO_COLORS[ammo]||'#2a2a2a';
   const ammoTag = ammo ? `<span class="ammo-tag" style="border-color:${ammoColor};color:${ammoColor}" onmouseenter="showAmmoTooltip(event,'${ammo}','${w.bp}')" onmouseleave="hideAmmoTooltip()">${ammo}</span>` : '';
   const rc=dim?' class="dim-row"':'';
-  return `<tr${rc} data-bp="${w.bp}" onclick="if(!event.target.closest('.ammo-tag'))openEditPanel('${w.bp}')" style="cursor:pointer"><td class="wn">${icon}<span>${esc(name)}</span>${ammoTag}</td><td class="cost">${w.cost}</td><td class="stat">${esc(info.modes)||'—'}</td><td class="stat">${info.muzzle||'—'}</td><td class="stat hi">${info.rpm||'—'}</td><td class="stat">${info.ads||'—'}</td></tr>`;
+  return `<tr${rc} data-bp="${w.bp}" onclick="if(!event.target.closest('.ammo-tag'))openWeaponModal('${w.bp}')" style="cursor:pointer"><td class="wn">${icon}<span>${esc(name)}</span>${ammoTag}</td><td class="cost">${w.cost}</td><td class="stat">${esc(info.modes)||'—'}</td><td class="stat">${info.muzzle||'—'}</td><td class="stat hi">${info.rpm||'—'}</td><td class="stat">${info.ads||'—'}</td></tr>`;
 }
 
 function classCard(c, side, role, wi, gi) {
@@ -446,7 +490,7 @@ function classCard(c, side, role, wi, gi) {
       const gico = GREN_ICON_MAP[g.bp];
       const desc = (gi[g.bp]||{}).item_description||'';
       const weight = (gi[g.bp]||{}).weight||'';
-      return `<tr data-bp="${g.bp}" style="cursor:pointer" onclick="openEditPanel('${g.bp}')"><td class="wn">${gico?`<img src="${gico}" class="wi">`:"<span class='wi-ph'></span>"}<span>${esc(name)}</span></td><td style="text-align:center;font-family:var(--mono);font-size:9px;font-weight:600;padding:5px 8px"><span style="background:${gc};padding:1px 5px;border-radius:2px;color:#ccc">${gt}</span></td><td class="cost">${g.cost}</td><td class="stat">${weight||'—'}</td><td class="stat" style="font-size:10px;color:#444;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(desc)}</td></tr>`;
+      return `<tr data-bp="${g.bp}" style="cursor:pointer" onclick="openWeaponModal('${g.bp}')"><td class="wn">${gico?`<img src="${gico}" class="wi">`:"<span class='wi-ph'></span>"}<span>${esc(name)}</span></td><td style="text-align:center;font-family:var(--mono);font-size:9px;font-weight:600;padding:5px 8px"><span style="background:${gc};padding:1px 5px;border-radius:2px;color:#ccc">${gt}</span></td><td class="cost">${g.cost}</td><td class="stat">${weight||'—'}</td><td class="stat" style="font-size:10px;color:#444;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(desc)}</td></tr>`;
     }).join('');
     grenHtml=`<div class="gren-section"><table class="weapon-table" style="width:100%"><thead><tr><th class="left">Grenade</th><th>Type</th><th>$</th><th>Wt</th><th class="left">Description</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
@@ -587,7 +631,7 @@ function diffClassCard(baseProps, newProps, side, role, baseWI, newWI, baseGI, n
     const rowStyle=w.status==='added'?'background:#091508;':w.status==='removed'?'background:#150a0a;opacity:.6;':w.status==='changed'?'background:#1a1200;':'';
     const dimClass=isDim&&w.status==='same'?' class="dim-row"':'';
     const nameStyle=w.status==='removed'?'text-decoration:line-through;color:#703030':w.status==='added'?'color:#3a8050':'';
-    return `<tr data-bp="${w.bp}" data-diff-item="${w.status}" style="${rowStyle}cursor:pointer"${dimClass} onclick="if(!event.target.closest('.ammo-tag'))openEditPanel('${w.bp}')"><td class="wn">${icon}<span style="${nameStyle}">${esc(name)}</span>${ammoTag}</td>${costCell}<td class="stat">${esc(w.info.modes)||'—'}</td><td class="stat">${w.info.muzzle||'—'}</td><td class="stat hi">${w.info.rpm||'—'}</td><td class="stat">${w.info.ads||'—'}</td></tr>`;
+    return `<tr data-bp="${w.bp}" data-diff-item="${w.status}" style="${rowStyle}cursor:pointer"${dimClass} onclick="if(!event.target.closest('.ammo-tag'))openWeaponModal('${w.bp}')"><td class="wn">${icon}<span style="${nameStyle}">${esc(name)}</span>${ammoTag}</td>${costCell}<td class="stat">${esc(w.info.modes)||'—'}</td><td class="stat">${w.info.muzzle||'—'}</td><td class="stat hi">${w.info.rpm||'—'}</td><td class="stat">${w.info.ads||'—'}</td></tr>`;
   }).join('');
 
   const pRows=makeRows(primRows,false);
@@ -607,7 +651,7 @@ function diffClassCard(baseProps, newProps, side, role, baseWI, newWI, baseGI, n
         :`<td class="cost"><span style="color:#6a4010;text-decoration:line-through;font-size:10px;margin-right:3px">${g.bCost}</span><span style="color:#c08020">→${g.nCost}</span></td>`;
       const rowStyle=g.status==='added'?'background:#091508;':g.status==='removed'?'background:#150a0a;opacity:.6;':g.status==='changed'?'background:#1a1200;':'';
       const nameStyle=g.status==='removed'?'text-decoration:line-through;color:#703030':g.status==='added'?'color:#3a8050':'';
-      return `<tr data-bp="${g.bp}" data-diff-item="${g.status}" style="${rowStyle}cursor:pointer" onclick="openEditPanel('${g.bp}')"><td class="wn">${gico?`<img src="${gico}" class="wi">`:"<span class='wi-ph'></span>"}<span style="${nameStyle}">${esc(name)}</span></td><td style="text-align:center;font-family:var(--mono);font-size:9px;font-weight:600;padding:5px 8px"><span style="background:${gc};padding:1px 5px;border-radius:2px;color:#ccc">${gt}</span></td>${costCell}<td class="stat">${weight||'—'}</td><td class="stat" style="font-size:10px;color:#444;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(desc)}</td></tr>`;
+      return `<tr data-bp="${g.bp}" data-diff-item="${g.status}" style="${rowStyle}cursor:pointer" onclick="openWeaponModal('${g.bp}')"><td class="wn">${gico?`<img src="${gico}" class="wi">`:"<span class='wi-ph'></span>"}<span style="${nameStyle}">${esc(name)}</span></td><td style="text-align:center;font-family:var(--mono);font-size:9px;font-weight:600;padding:5px 8px"><span style="background:${gc};padding:1px 5px;border-radius:2px;color:#ccc">${gt}</span></td>${costCell}<td class="stat">${weight||'—'}</td><td class="stat" style="font-size:10px;color:#444;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(desc)}</td></tr>`;
     }).join('');
     grenHtml=`<div class="gren-section"><table class="weapon-table" style="width:100%"><thead><tr><th class="left">Grenade</th><th>Type</th><th>$</th><th>Wt</th><th class="left">Description</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
@@ -718,8 +762,7 @@ document.addEventListener('drop',e=>{
       const data = await res.json();
       if (data && Object.keys(data).length > 0) {
         currentData = data;
-        diffActive = true;
-        renderDiff(BAKED_DATA, data);
+        render(data);
         return;
       }
     }
@@ -733,8 +776,8 @@ let editingBP = null;
 function buildIconGrid(selectedKey){
   const allIcons={...WEAPON_ICONS,...GRENADE_ICONS,...CLASS_ICONS,...FACTION_ICONS};
   document.getElementById('ep-icon-grid').innerHTML=Object.entries(allIcons)
-    .filter(([,v])=>v&&v!==null)
-    .map(([k,v])=>`<button class="ep-icon-btn${k===selectedKey?' selected':''}" data-key="${k}" onclick="selectIcon('${k}')" title="${k}"><img src="${v}" loading="lazy" style="mix-blend-mode:screen"></button>`)
+    .filter(([,v])=>v&&v.startsWith('data:'))
+    .map(([k,v])=>`<button class="ep-icon-btn${k===selectedKey?' selected':''}" data-key="${k}" onclick="selectIcon('${k}')" title="${k}"><img src="${v}" loading="lazy"></button>`)
     .join('');
 }
 
@@ -908,6 +951,213 @@ function confirmPush(){
   document.getElementById('push-status').textContent = '';
 }
 
+
+// ── WEAPON DETAIL MODAL ───────────────────────────────────────────────────
+function openWeaponModal(bp) {
+  const wi = currentData.weapons || BAKED_DATA.weapons || {};
+  const wdata = wi[bp] || {};
+  const ov = WO[bp] || {};
+
+  // Resolve display values (WO overrides > currentData > baked)
+  const name = ov.name || wdata.item_name || bp.replace('BP_Firearm_','').replace('BP_Grenade_','');
+  const ammoKey = ov.ammo || wdata._ammo_override || '';
+  const modes = ov.modes || wdata._modes_override || extractModes(wdata.weapon_config);
+  const muzzle = ov.muzzle || wdata._muzzle_override || extractNum(wdata.weapon_config, 'muzzle_velocity');
+  const rpmVal = ov.rpm || wdata._rpm_override || calcRPM(wdata.weapon_config);
+  const ads = ov.ads || wdata._ads_override || extractNum(wdata.weapon_config, 'aim_down_sights_time');
+  const weight = parseFloat(wdata.weight) || 0;
+  const cat = (wdata.firearm_category||'').replace(/<.*>/,'').replace('FirearmCategory.','').replace(/_/g,' ').toLowerCase();
+
+  // Icon
+  const allIcons = {...WEAPON_ICONS,...GRENADE_ICONS};
+  const iconKey = ov.iconKey || bp.replace('BP_Firearm_','').replace('BP_Grenade_','');
+  const iconSrc = ov.icon || allIcons[iconKey] || null;
+  const iconHtml = iconSrc
+    ? `<img src="${iconSrc}" class="wdm-icon">`
+    : `<div class="wdm-icon-ph"></div>`;
+
+  // Ammo & damage
+  const a = AMMO_DATA[ammoKey] || null;
+  const wd = WEAPON_DAMAGE[bp] || null;
+  let ammoBanner = '';
+  let dmgHtml = '';
+  let statsRows = '';
+
+  if (a) {
+    const mv = wd ? wd.mv : muzzle;
+    const dmgClose = (wd ? wd.dmg : a.dmg_close) || a.dmg_close;
+    const dmgLong = a.dmg_long;
+    const pellets = (wd ? wd.pellets : a.pellets) || 1;
+    const isShot = pellets > 1;
+    const stkClose = wd ? wd.stk : (isShot ? Math.ceil(100/(dmgClose*pellets)) : a.stk_close);
+    const stkLong = isShot ? Math.ceil(100/(dmgLong*pellets)) : a.stk_long;
+    const [penText, penClass] = penLabel(a.pen);
+    const dmgCloseDisp = isShot ? `${Math.round(dmgClose)} × ${pellets}` : Math.round(dmgClose);
+    const dmgLongDisp = isShot ? `${Math.round(dmgLong)} × ${pellets}` : Math.round(dmgLong);
+    const maxDmg = 100;
+    const closeBar = Math.min(100, Math.round((dmgClose*(isShot?pellets:1))/maxDmg*100));
+    const longBar = Math.min(100, Math.round((dmgLong*(isShot?pellets:1))/maxDmg*100));
+
+    ammoBanner = `<div class="wdm-ammo-banner">
+      <span class="wdm-ammo-name">${ammoKey}</span>
+      <span style="color:#333;font-size:10px">${a.name||''}</span>
+      ${mv ? `<span class="wdm-ammo-mv">${mv} m/s</span>` : ''}
+    </div>`;
+
+    dmgHtml = `<div class="wdm-dmg-grid">
+      <div class="wdm-dmg-cell"><div class="wdm-dmg-label">Damage (close)</div><div class="wdm-dmg-val">${dmgCloseDisp}</div></div>
+      <div class="wdm-dmg-cell"><div class="wdm-dmg-label">Damage (long)</div><div class="wdm-dmg-val">${dmgLongDisp}</div></div>
+    </div>
+    <div class="wdm-bar-wrap">
+      <div class="wdm-bar-label"><span>Close</span><span>${stkClose} shots to kill</span></div>
+      <div class="wdm-bar-bg"><div class="wdm-bar-fill" style="width:${closeBar}%"></div></div>
+    </div>
+    <div class="wdm-bar-wrap">
+      <div class="wdm-bar-label"><span>Long</span><span>${stkLong} shots to kill</span></div>
+      <div class="wdm-bar-bg"><div class="wdm-bar-fill" style="width:${longBar}%;background:#888"></div></div>
+    </div>`;
+
+    statsRows += `<div class="wdm-row"><span class="wdm-row-label">Wall penetration</span><span class="wdm-row-val ${penClass}">${penText}</span></div>`;
+    statsRows += `<div class="wdm-row"><span class="wdm-row-label">Suppression</span><span class="wdm-row-val">${a.supp}</span></div>`;
+    statsRows += `<div class="wdm-row"><span class="wdm-row-label">Max surfaces</span><span class="wdm-row-val">${a.maxpen}</span></div>`;
+  }
+
+  if (modes) statsRows += `<div class="wdm-row"><span class="wdm-row-label">Fire modes</span><span class="wdm-row-val">${modes}</span></div>`;
+  if (rpmVal) statsRows += `<div class="wdm-row"><span class="wdm-row-label">RPM</span><span class="wdm-row-val">${rpmVal}</span></div>`;
+  if (muzzle && !a) statsRows += `<div class="wdm-row"><span class="wdm-row-label">Muzzle velocity</span><span class="wdm-row-val">${muzzle} m/s</span></div>`;
+  if (ads) statsRows += `<div class="wdm-row"><span class="wdm-row-label">ADS time</span><span class="wdm-row-val">${parseFloat(ads).toFixed(2)}s</span></div>`;
+  if (weight) statsRows += `<div class="wdm-row"><span class="wdm-row-label">Weight</span><span class="wdm-row-val">${weight}</span></div>`;
+  if (cat) statsRows += `<div class="wdm-row"><span class="wdm-row-label">Category</span><span class="wdm-row-val" style="text-transform:capitalize">${cat}</span></div>`;
+
+  // Reload times
+  let reloadHtml = '';
+  const rt = extractReloadTimes(wdata.default_reload_times);
+  if (rt) {
+    reloadHtml = `<div class="wdm-section-title">Reload Times</div>
+    <div class="wdm-reload-grid">
+      ${rt.tactical!=null?`<div class="wdm-reload-cell"><div class="wdm-reload-type">Tactical</div><div class="wdm-reload-val">${rt.tactical.toFixed(2)}s</div></div>`:''}
+      ${rt.tactical_speed!=null?`<div class="wdm-reload-cell"><div class="wdm-reload-type">Speed</div><div class="wdm-reload-val">${rt.tactical_speed.toFixed(2)}s</div></div>`:''}
+      ${rt.dry!=null?`<div class="wdm-reload-cell"><div class="wdm-reload-type">Dry</div><div class="wdm-reload-val">${rt.dry.toFixed(2)}s</div></div>`:''}
+      ${rt.dry_speed!=null?`<div class="wdm-reload-cell"><div class="wdm-reload-type">Dry Speed</div><div class="wdm-reload-val">${rt.dry_speed.toFixed(2)}s</div></div>`:''}
+    </div>`;
+  }
+
+  // Accepted ammo chips
+  let ammoChips = '';
+  const accepted = wdata.accepted_ammo || '';
+  const ammoNames = [...accepted.matchAll(/AmmoMagazine_([A-Za-z0-9_]+)\./g)].map(m=>m[1].replace(/_/g,' '));
+  if (ammoNames.length) {
+    ammoChips = `<div class="wdm-section-title">Accepted Magazines</div>
+    <div class="wdm-ammo-tags">${ammoNames.map(n=>`<span class="wdm-ammo-chip">${n}</span>`).join('')}</div>`;
+  }
+
+  const statsPanel = document.getElementById('wdm-stats');
+  statsPanel.innerHTML = `
+    <div class="wdm-header">
+      ${iconHtml}
+      <div>
+        <div class="wdm-title">${esc(name)}</div>
+        <div class="wdm-sub">${bp}</div>
+      </div>
+    </div>
+    ${ammoBanner}
+    ${dmgHtml}
+    ${statsRows ? `<div class="wdm-rows">${statsRows}</div>` : ''}
+    ${reloadHtml}
+    ${ammoChips}
+  `;
+
+  // Edit panel side (admin only)
+  const editCol = document.getElementById('wdm-edit');
+  if (IS_ADMIN) {
+    editCol.style.display = '';
+    // Move the edit panel element into the modal column
+    const ep = document.getElementById('edit-panel');
+    editCol.appendChild(ep);
+    ep.classList.add('open');
+    // Populate the edit panel fields
+    editingBP = bp;
+    const ov2 = WO[bp] || {};
+    document.getElementById('ep-title').textContent = name;
+    document.getElementById('ep-name').value = ov2.name || '';
+    const ammoSel = document.getElementById('ep-ammo');
+    ammoSel.innerHTML = '<option value="">— default —</option>' + Object.keys(AMMO_DATA).map(k=>`<option value="${k}">${k} — ${AMMO_DATA[k].name||k}</option>`).join('');
+    ammoSel.value = ov2.ammo || '';
+    document.getElementById('ep-modes').value = ov2.modes || '';
+    document.getElementById('ep-muzzle').value = ov2.muzzle || '';
+    document.getElementById('ep-rpm').value = ov2.rpm || '';
+    document.getElementById('ep-ads').value = ov2.ads || '';
+    document.getElementById('ep-icon-search').value = '';
+    buildIconGrid(ov2.iconKey || null);
+    refreshOverridesList();
+  } else {
+    editCol.style.display = 'none';
+  }
+
+  document.getElementById('wdm-overlay').classList.add('open');
+  document.body.style.overflow = 'hidden';
+}
+
+function closeWeaponModal() {
+  document.getElementById('wdm-overlay').classList.remove('open');
+  document.body.style.overflow = '';
+  // Move edit panel back to body if admin
+  if (IS_ADMIN) {
+    const ep = document.getElementById('edit-panel');
+    if (ep) {
+      document.body.appendChild(ep);
+      ep.classList.remove('open');
+    }
+  }
+  editingBP = null;
+}
+
+// Helper: extract a float from the weapon_config string
+function extractNum(cfg, key) {
+  if (!cfg) return null;
+  const m = cfg.match(new RegExp(key + ':\\s*([0-9.]+)'));
+  return m ? parseFloat(m[1]) : null;
+}
+
+// Helper: extract fire modes from firemodes int
+function extractModes(cfg) {
+  if (!cfg) return '';
+  const m = cfg.match(/firemodes:\s*(\d+)/);
+  if (!m) return '';
+  const f = parseInt(m[1]);
+  const modes = [];
+  if (f & 2) modes.push('Semi');
+  if (f & 8) modes.push('Auto');
+  if (f & 4) modes.push('Burst');
+  return modes.join('/') || '';
+}
+
+// Helper: calculate RPM from time_between_shots
+function calcRPM(cfg) {
+  if (!cfg) return null;
+  const m = cfg.match(/time_between_shots:\s*([0-9.]+)/);
+  if (!m) return null;
+  return Math.round(60 / parseFloat(m[1]));
+}
+
+// Helper: extract reload times from default_reload_times string
+function extractReloadTimes(rt) {
+  if (!rt) return null;
+  const get = (key) => {
+    const m = rt.match(new RegExp(key + ':\s*\{[^}]*sequence:\s*([0-9.]+)'));
+    return m ? parseFloat(m[1]) : null;
+  };
+  return {
+    tactical: get('tactical(?!_speed)'),
+    tactical_speed: get('tactical_speed'),
+    dry: get('dry(?!_speed)'),
+    dry_speed: get('dry_speed'),
+  };
+}
+
+// Patch saveOverride/resetOverride to refresh modal stats after save
+
+
 async function doPush(){
   const token = getToken();
   if(!token){ alert('No token provided.'); return; }
@@ -1028,6 +1278,15 @@ async function doPush(){
       <button onclick="document.getElementById('push-confirm').classList.remove('show')">Cancel</button>
       <button class="primary" onclick="doPush()">Confirm Push</button>
     </div>
+  </div>
+</div>
+
+<!-- WEAPON DETAIL MODAL -->
+<div id="wdm-overlay" onclick="if(event.target===this)closeWeaponModal()">
+  <div id="wdm-box">
+    <button id="wdm-close" onclick="closeWeaponModal()">✕</button>
+    <div id="wdm-stats"></div>
+    <div id="wdm-edit" style="display:none"></div>
   </div>
 </div>
 </body>
