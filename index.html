@@ -236,7 +236,7 @@ td.flags{padding:7px 14px}
 .wdm-icon{width:64px;height:40px;object-fit:contain;mix-blend-mode:screen;flex-shrink:0}
 .wdm-icon-ph{width:64px;height:40px;flex-shrink:0}
 .wdm-title{font-size:18px;font-weight:700;color:#e0e0e0;letter-spacing:.5px}
-.wdm-sub{font-size:11px;color:#444;font-family:'JetBrains Mono',monospace;margin-top:3px}
+.wdm-sub{font-size:11px;color:#333;font-family:'JetBrains Mono',monospace;margin-top:3px}
 .wdm-ammo-banner{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:3px;margin-bottom:18px}
 .wdm-ammo-name{font-size:12px;font-weight:600;color:#bbb;font-family:'JetBrains Mono',monospace}
 .wdm-ammo-mv{font-size:11px;color:#444;font-family:'JetBrains Mono',monospace;margin-left:auto}
@@ -244,11 +244,11 @@ td.flags{padding:7px 14px}
 .wdm-dmg-cell{background:#0d0d0d;padding:12px 14px}
 .wdm-dmg-label{font-size:10px;color:#444;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
 .wdm-dmg-val{font-size:26px;font-weight:700;color:#e0e0e0;font-family:'JetBrains Mono',monospace;line-height:1}
-.wdm-bar-wrap{margin-bottom:18px}
+.wdm-bar-wrap{margin-bottom:14px}
 .wdm-bar-label{font-size:10px;color:#333;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;display:flex;justify-content:space-between}
-.wdm-bar-label span:last-child{color:#666}
+.wdm-bar-label span:last-child{color:#555}
 .wdm-bar-bg{height:4px;background:#1a1a1a;border-radius:2px;overflow:hidden}
-.wdm-bar-fill{height:100%;border-radius:2px;background:var(--accent);transition:width .3s ease}
+.wdm-bar-fill{height:100%;border-radius:2px;background:var(--accent)}
 .wdm-rows{margin-bottom:18px}
 .wdm-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #111}
 .wdm-row:last-child{border-bottom:none}
@@ -264,7 +264,6 @@ td.flags{padding:7px 14px}
 .wdm-reload-val{font-size:13px;font-weight:700;color:#888;font-family:'JetBrains Mono',monospace}
 .wdm-ammo-tags{display:flex;flex-wrap:wrap;gap:5px}
 .wdm-ammo-chip{font-size:9px;font-family:'JetBrains Mono',monospace;padding:2px 6px;border:1px solid #222;border-radius:2px;color:#444}
-/* edit panel inside modal — reuse existing ep styles, no position:fixed */
 #wdm-edit #edit-panel{position:static;width:100%;height:100%;right:auto;border-left:none;box-shadow:none;display:flex;flex-direction:column}
 #wdm-edit #edit-panel.open{right:auto}
 </style>
@@ -954,11 +953,10 @@ function confirmPush(){
 
 // ── WEAPON DETAIL MODAL ───────────────────────────────────────────────────
 function openWeaponModal(bp) {
-  const wi = currentData.weapons || BAKED_DATA.weapons || {};
+  const wi = (currentData && currentData.weapons) || BAKED_DATA.weapons || {};
   const wdata = wi[bp] || {};
   const ov = WO[bp] || {};
 
-  // Resolve display values (WO overrides > currentData > baked)
   const name = ov.name || wdata.item_name || bp.replace('BP_Firearm_','').replace('BP_Grenade_','');
   const ammoKey = ov.ammo || wdata._ammo_override || '';
   const modes = ov.modes || wdata._modes_override || extractModes(wdata.weapon_config);
@@ -966,17 +964,15 @@ function openWeaponModal(bp) {
   const rpmVal = ov.rpm || wdata._rpm_override || calcRPM(wdata.weapon_config);
   const ads = ov.ads || wdata._ads_override || extractNum(wdata.weapon_config, 'aim_down_sights_time');
   const weight = parseFloat(wdata.weight) || 0;
-  const cat = (wdata.firearm_category||'').replace(/<.*>/,'').replace('FirearmCategory.','').replace(/_/g,' ').toLowerCase();
+  const cat = (wdata.firearm_category||'').replace(/<[^>]*>/g,'').replace('FirearmCategory.','').replace(/_/g,' ').toLowerCase();
 
-  // Icon
-  const allIcons = {...WEAPON_ICONS,...GRENADE_ICONS};
-  const iconKey = ov.iconKey || bp.replace('BP_Firearm_','').replace('BP_Grenade_','');
-  const iconSrc = ov.icon || allIcons[iconKey] || null;
+  // Icon — key is the full BP string in WEAPON_ICONS
+  const allIcons = {...(WEAPON_ICONS||{}),...(GRENADE_ICONS||{})};
+  const iconSrc = ov.icon || allIcons[bp] || null;
   const iconHtml = iconSrc
     ? `<img src="${iconSrc}" class="wdm-icon">`
     : `<div class="wdm-icon-ph"></div>`;
 
-  // Ammo & damage
   const a = AMMO_DATA[ammoKey] || null;
   const wd = WEAPON_DAMAGE[bp] || null;
   let ammoBanner = '';
@@ -984,23 +980,23 @@ function openWeaponModal(bp) {
   let statsRows = '';
 
   if (a) {
-    const mv = wd ? wd.mv : muzzle;
-    const dmgClose = (wd ? wd.dmg : a.dmg_close) || a.dmg_close;
+    const mv = muzzle || (wd ? wd.mv : null);
+    const dmgClose = (wd ? wd.dmg : null) || a.dmg_close;
     const dmgLong = a.dmg_long;
-    const pellets = (wd ? wd.pellets : a.pellets) || 1;
+    const pellets = (wd ? wd.pellets : null) || a.pellets || 1;
     const isShot = pellets > 1;
-    const stkClose = wd ? wd.stk : (isShot ? Math.ceil(100/(dmgClose*pellets)) : a.stk_close);
+    const stkClose = (wd ? wd.stk : null) || (isShot ? Math.ceil(100/(dmgClose*pellets)) : a.stk_close);
     const stkLong = isShot ? Math.ceil(100/(dmgLong*pellets)) : a.stk_long;
     const [penText, penClass] = penLabel(a.pen);
-    const dmgCloseDisp = isShot ? `${Math.round(dmgClose)} × ${pellets}` : Math.round(dmgClose);
-    const dmgLongDisp = isShot ? `${Math.round(dmgLong)} × ${pellets}` : Math.round(dmgLong);
+    const dmgCloseDisp = isShot ? `${Math.round(dmgClose)} \xd7 ${pellets}` : Math.round(dmgClose);
+    const dmgLongDisp = isShot ? `${Math.round(dmgLong)} \xd7 ${pellets}` : Math.round(dmgLong);
     const maxDmg = 100;
     const closeBar = Math.min(100, Math.round((dmgClose*(isShot?pellets:1))/maxDmg*100));
     const longBar = Math.min(100, Math.round((dmgLong*(isShot?pellets:1))/maxDmg*100));
 
     ammoBanner = `<div class="wdm-ammo-banner">
       <span class="wdm-ammo-name">${ammoKey}</span>
-      <span style="color:#333;font-size:10px">${a.name||''}</span>
+      <span style="color:#333;font-size:10px;margin-left:6px">${a.name||''}</span>
       ${mv ? `<span class="wdm-ammo-mv">${mv} m/s</span>` : ''}
     </div>`;
 
@@ -1029,7 +1025,6 @@ function openWeaponModal(bp) {
   if (weight) statsRows += `<div class="wdm-row"><span class="wdm-row-label">Weight</span><span class="wdm-row-val">${weight}</span></div>`;
   if (cat) statsRows += `<div class="wdm-row"><span class="wdm-row-label">Category</span><span class="wdm-row-val" style="text-transform:capitalize">${cat}</span></div>`;
 
-  // Reload times
   let reloadHtml = '';
   const rt = extractReloadTimes(wdata.default_reload_times);
   if (rt) {
@@ -1042,7 +1037,6 @@ function openWeaponModal(bp) {
     </div>`;
   }
 
-  // Accepted ammo chips
   let ammoChips = '';
   const accepted = wdata.accepted_ammo || '';
   const ammoNames = [...accepted.matchAll(/AmmoMagazine_([A-Za-z0-9_]+)\./g)].map(m=>m[1].replace(/_/g,' '));
@@ -1051,8 +1045,7 @@ function openWeaponModal(bp) {
     <div class="wdm-ammo-tags">${ammoNames.map(n=>`<span class="wdm-ammo-chip">${n}</span>`).join('')}</div>`;
   }
 
-  const statsPanel = document.getElementById('wdm-stats');
-  statsPanel.innerHTML = `
+  document.getElementById('wdm-stats').innerHTML = `
     <div class="wdm-header">
       ${iconHtml}
       <div>
@@ -1067,15 +1060,12 @@ function openWeaponModal(bp) {
     ${ammoChips}
   `;
 
-  // Edit panel side (admin only)
   const editCol = document.getElementById('wdm-edit');
   if (IS_ADMIN) {
     editCol.style.display = '';
-    // Move the edit panel element into the modal column
     const ep = document.getElementById('edit-panel');
     editCol.appendChild(ep);
     ep.classList.add('open');
-    // Populate the edit panel fields
     editingBP = bp;
     const ov2 = WO[bp] || {};
     document.getElementById('ep-title').textContent = name;
@@ -1101,25 +1091,19 @@ function openWeaponModal(bp) {
 function closeWeaponModal() {
   document.getElementById('wdm-overlay').classList.remove('open');
   document.body.style.overflow = '';
-  // Move edit panel back to body if admin
   if (IS_ADMIN) {
     const ep = document.getElementById('edit-panel');
-    if (ep) {
-      document.body.appendChild(ep);
-      ep.classList.remove('open');
-    }
+    if (ep) { document.body.appendChild(ep); ep.classList.remove('open'); }
   }
   editingBP = null;
 }
 
-// Helper: extract a float from the weapon_config string
 function extractNum(cfg, key) {
   if (!cfg) return null;
   const m = cfg.match(new RegExp(key + ':\\s*([0-9.]+)'));
   return m ? parseFloat(m[1]) : null;
 }
 
-// Helper: extract fire modes from firemodes int
 function extractModes(cfg) {
   if (!cfg) return '';
   const m = cfg.match(/firemodes:\s*(\d+)/);
@@ -1132,7 +1116,6 @@ function extractModes(cfg) {
   return modes.join('/') || '';
 }
 
-// Helper: calculate RPM from time_between_shots
 function calcRPM(cfg) {
   if (!cfg) return null;
   const m = cfg.match(/time_between_shots:\s*([0-9.]+)/);
@@ -1140,11 +1123,10 @@ function calcRPM(cfg) {
   return Math.round(60 / parseFloat(m[1]));
 }
 
-// Helper: extract reload times from default_reload_times string
 function extractReloadTimes(rt) {
   if (!rt) return null;
-  const get = (key) => {
-    const m = rt.match(new RegExp(key + ':\s*\{[^}]*sequence:\s*([0-9.]+)'));
+  const get = (pat) => {
+    const m = rt.match(new RegExp(pat + ':\\s*\\{[^}]*sequence:\\s*([0-9.]+)'));
     return m ? parseFloat(m[1]) : null;
   };
   return {
@@ -1154,8 +1136,6 @@ function extractReloadTimes(rt) {
     dry_speed: get('dry_speed'),
   };
 }
-
-// Patch saveOverride/resetOverride to refresh modal stats after save
 
 
 async function doPush(){
@@ -1281,10 +1261,9 @@ async function doPush(){
   </div>
 </div>
 
-<!-- WEAPON DETAIL MODAL -->
 <div id="wdm-overlay" onclick="if(event.target===this)closeWeaponModal()">
   <div id="wdm-box">
-    <button id="wdm-close" onclick="closeWeaponModal()">✕</button>
+    <button id="wdm-close" onclick="closeWeaponModal()">&#x2715;</button>
     <div id="wdm-stats"></div>
     <div id="wdm-edit" style="display:none"></div>
   </div>
