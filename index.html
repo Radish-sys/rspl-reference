@@ -718,7 +718,8 @@ document.addEventListener('drop',e=>{
       const data = await res.json();
       if (data && Object.keys(data).length > 0) {
         currentData = data;
-        render(data);
+        diffActive = true;
+        renderDiff(BAKED_DATA, data);
         return;
       }
     }
