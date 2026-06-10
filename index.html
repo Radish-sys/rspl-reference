@@ -718,8 +718,7 @@ document.addEventListener('drop',e=>{
       const data = await res.json();
       if (data && Object.keys(data).length > 0) {
         currentData = data;
-        diffActive = true;
-        renderDiff(BAKED_DATA, data);
+        render(data);
         return;
       }
     }
@@ -916,7 +915,20 @@ async function doPush(){
   status.textContent = 'Working...';
   status.style.color = '#555';
 
-  const content = btoa(unescape(encodeURIComponent(JSON.stringify(currentData, null, 2))));
+  // Merge WO (panel edits) into currentData before pushing
+  const mergedData = JSON.parse(JSON.stringify(currentData));
+  for (const [bp, ov] of Object.entries(WO)) {
+    if (mergedData.weapons && mergedData.weapons[bp]) {
+      if (ov.name !== undefined) mergedData.weapons[bp].item_name = ov.name;
+      if (ov.ammo !== undefined) mergedData.weapons[bp]._ammo_override = ov.ammo;
+      if (ov.modes !== undefined) mergedData.weapons[bp]._modes_override = ov.modes;
+      if (ov.muzzle !== undefined) mergedData.weapons[bp]._muzzle_override = ov.muzzle;
+      if (ov.rpm !== undefined) mergedData.weapons[bp]._rpm_override = ov.rpm;
+      if (ov.ads !== undefined) mergedData.weapons[bp]._ads_override = ov.ads;
+      if (ov.icon !== undefined) mergedData.weapons[bp]._icon_override = ov.icon;
+    }
+  }
+  const content = btoa(unescape(encodeURIComponent(JSON.stringify(mergedData, null, 2))));
   const apiBase = `https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`;
 
   try {
