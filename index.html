@@ -48,7 +48,8 @@ nav{display:flex;height:100%;margin-left:8px;flex-shrink:0}
 .weapon-table td{padding:5px 8px;border-bottom:1px solid #111;vertical-align:middle}
 .weapon-table tr:hover td{background:#141414}
 .weapon-table tr:last-child td{border-bottom:none}
-tr.dim-row td{opacity:.45}tr.dim-row:hover td{opacity:.75}
+tr.dim-row td:not(.wn){opacity:.45}tr.dim-row:hover td:not(.wn){opacity:.75}
+.wi,.wicon,.gi,.cls-icon,.tab-icon,.faction-icon{mix-blend-mode:screen}
 tr.section-sep td{background:var(--s2);color:var(--dim);font-family:var(--mono);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;padding:4px 8px;border-top:1px solid var(--b1)}
 td.wn{display:flex;align-items:center;gap:6px;white-space:nowrap}
 .wi{height:18px;width:auto;max-width:56px;object-fit:contain;opacity:.6;flex-shrink:0;transition:opacity .12s}
@@ -333,6 +334,8 @@ td.flags{padding:7px 14px}
 <script src="icons.js"></script>
 <script src="data.js"></script>
 <script>
+const IS_ADMIN = new URLSearchParams(window.location.search).get('admin') === 'rspl2admin';
+if(!IS_ADMIN){ document.addEventListener('DOMContentLoaded',()=>{ ['edit-panel','edit-panel-bg'].forEach(id=>{const el=document.getElementById(id);if(el)el.remove();}); const ub=document.getElementById('admin-btns');if(ub)ub.remove(); }); }
 
 
 
@@ -733,7 +736,7 @@ function filterIcons(q){
 
 function getSelectedIcon(){ const b=document.querySelector('.ep-icon-btn.selected'); return b?b.dataset.key:null; }
 
-function openEditPanel(bp){
+function openEditPanel(bp){ if(!IS_ADMIN) return;
   editingBP=bp;
   const ov=WO[bp]||{};
   document.getElementById('ep-title').textContent=bp.replace('BP_Firearm_','').replace('BP_Grenade_','');
