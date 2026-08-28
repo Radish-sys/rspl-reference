@@ -3,119 +3,140 @@
 <head>
 <meta charset="UTF-8">
 <title>RSPL2 — Reference</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700&family=Barlow+Condensed:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script>(function(){try{var t=localStorage.getItem('rspl-theme');if(t)document.documentElement.setAttribute('data-theme',t);}catch(e){}})();</script>
 <style>
+
+/* ── Design tokens, ported from splstats.net ── */
+:root{
+  --display:"Big Shoulders Display",sans-serif;
+  --cond:"Barlow Condensed",sans-serif;
+  --mono:"IBM Plex Mono",monospace;
+  --sans:var(--cond);
+  /* fixed semantic colors — not theme-dependent */
+  --ins:#c0524a;
+  --sec:#4f8fc9;
+  --orange:#c9832f;
+  --blue:#4f8fc9;
+}
+:root,[data-theme="dust"]{--bg:#16140e;--panel:#201c13;--panel-edge:#2e2818;--text:#e6dfc8;--muted:#8d8465;--accent:#d07127;--accent-soft:rgba(208,113,39,.12);--accent-soft2:rgba(208,113,39,.03);--win:#7ea15a;--loss:#b0533b;}
+[data-theme="nightops"]{--bg:#0d1117;--panel:#141b24;--panel-edge:#1c2430;--text:#dbe3ec;--muted:#6b7a8f;--accent:#4ea3a0;--accent-soft:rgba(78,163,160,.16);--accent-soft2:rgba(78,163,160,.03);--win:#6fbf87;--loss:#d1604f;}
+[data-theme="coldsteel"]{--bg:#0b1015;--panel:#111820;--panel-edge:#1a232e;--text:#dde5ed;--muted:#63748a;--accent:#4f9ed9;--accent-soft:rgba(79,158,217,.17);--accent-soft2:rgba(79,158,217,.03);--win:#6fbf87;--loss:#d1604f;}
+[data-theme="ember"]{--bg:#101112;--panel:#191a1c;--panel-edge:#262829;--text:#e9eaec;--muted:#7a7d80;--accent:#cf5f3a;--accent-soft:rgba(207,95,58,.16);--accent-soft2:rgba(207,95,58,.03);--win:#7fc7a4;--loss:#cf5f3a;}
+[data-theme="deepteal"]{--bg:#0a1013;--panel:#0f1c1f;--panel-edge:#16262a;--text:#d9e8e7;--muted:#5d7a7d;--accent:#3fbfa8;--accent-soft:rgba(63,191,168,.18);--accent-soft2:rgba(63,191,168,.03);--win:#7fc78f;--loss:#d9705a;}
+[data-theme="gunmetal"]{--bg:#0e0f11;--panel:#16181c;--panel-edge:#23252a;--text:#eceef1;--muted:#71747a;--accent:#7fc7a4;--accent-soft:rgba(232,233,236,.10);--accent-soft2:rgba(232,233,236,.02);--win:#7fc7a4;--loss:#d1705f;}
+[data-theme="odgreen"]{--bg:#12140f;--panel:#1a1d14;--panel-edge:#262a1d;--text:#e4e6d9;--muted:#7d8470;--accent:#8fae4b;--accent-soft:rgba(143,174,75,.16);--accent-soft2:rgba(143,174,75,.03);--win:#cfd8a8;--loss:#c2603f;}
+[data-theme="ash"]{--bg:#0f0f10;--panel:#191919;--panel-edge:#272728;--text:#e6e6e7;--muted:#79797d;--accent:#b9bec4;--accent-soft:rgba(185,190,196,.13);--accent-soft2:rgba(185,190,196,.02);--win:#83bf94;--loss:#c9695a;}
+[data-theme="crimson"]{--bg:#120e0e;--panel:#1c1616;--panel-edge:#2a2020;--text:#ece1e1;--muted:#8a7676;--accent:#c0392b;--accent-soft:rgba(192,57,43,.17);--accent-soft2:rgba(192,57,43,.03);--win:#7fb08a;--loss:#c0392b;}
+[data-theme="glacier"]{--bg:#0c1114;--panel:#131b20;--panel-edge:#1e272e;--text:#dfe9ee;--muted:#6a7d88;--accent:#7ec8e3;--accent-soft:rgba(126,200,227,.16);--accent-soft2:rgba(126,200,227,.03);--win:#7fc7a4;--loss:#d1705f;}
+[data-theme="nightshade"]{--bg:#100e14;--panel:#191622;--panel-edge:#262032;--text:#e7e2ef;--muted:#7d7691;--accent:#9b7ede;--accent-soft:rgba(155,126,222,.17);--accent-soft2:rgba(155,126,222,.03);--win:#7fc7a4;--loss:#d1705f;}
+[data-theme="bone"]{--bg:#e9e3d5;--panel:#f3eee3;--panel-edge:#d2c9b5;--text:#2a2620;--muted:#766e5f;--accent:#a8541f;--accent-soft:rgba(168,84,31,.15);--accent-soft2:rgba(168,84,31,.03);--win:#4c7a37;--loss:#a33d2a;}
+:root{
+  /* compatibility aliases for this file's existing markup */
+  --s1:var(--panel);--s2:var(--accent-soft2);--s3:var(--panel);
+  --b1:var(--panel-edge);--b2:var(--panel-edge);--b3:var(--muted);
+  --dim:var(--muted);--hi:var(--text);
+  --red:var(--loss);--green:var(--win);
+}
+[data-theme="bone"] .cls-icon,[data-theme="bone"] .tab-icon,[data-theme="bone"] .ep-icon-btn img{filter:invert(0)}
+/* weapon/grenade icon PNGs are white-on-opaque-black; screen-blend fakes transparency on dark UIs.
+   On the light "bone" theme, invert + multiply-blend fakes transparency the other way round. */
+[data-theme="bone"] .wi,[data-theme="bone"] .wicon,[data-theme="bone"] .gi,[data-theme="bone"] .wdm-icon{filter:invert(1) contrast(1.05);mix-blend-mode:multiply}
 
 *{box-sizing:border-box;margin:0;padding:0}
 html,body{height:100%;overflow:hidden}
-body{background:var(--bg);color:var(--text);font-family:var(--sans);font-size:13px;display:flex;flex-direction:column}
-header{display:flex;align-items:center;height:48px;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0;padding:0 20px;gap:16px;overflow-x:auto}
-.logo{font-size:14px;font-weight:600;white-space:nowrap}.logo em{color:var(--ins);font-style:normal}
-.logo-sub{font-size:10px;color:var(--dim);font-family:var(--mono);white-space:nowrap}
-nav{display:flex;height:100%;margin-left:8px;flex-shrink:0}
-.tab{padding:0 12px;cursor:pointer;border-bottom:2px solid transparent;font-size:10px;font-weight:500;color:var(--dim);display:flex;align-items:center;gap:6px;letter-spacing:.3px;text-transform:uppercase;font-family:var(--mono);transition:color .12s;white-space:nowrap}
-.tab:hover{color:var(--text)}.tab.active{color:var(--text);border-bottom-color:var(--ins)}
+body{background:var(--bg);color:var(--text);font-family:var(--cond);font-size:14px;display:flex;flex-direction:column}
+
+/* Header */
+header{display:flex;align-items:center;height:52px;background:var(--panel);border-bottom:1px solid var(--panel-edge);flex-shrink:0;padding:0 22px;gap:18px;overflow-x:auto}
+.logo-block{display:flex;flex-direction:column;justify-content:center;gap:2px;padding-right:18px;border-right:1px solid var(--panel-edge);height:100%;flex-shrink:0}
+.logo{font-family:var(--display);font-size:19px;font-weight:600;letter-spacing:.3px;white-space:nowrap}
+.logo em{color:var(--accent);font-style:normal}
+.logo-sub{font-size:10.5px;color:var(--muted);font-family:var(--mono);letter-spacing:.5px;white-space:nowrap}
+nav{display:flex;height:100%;margin-left:4px;flex-shrink:0}
+.tab{padding:0 14px;cursor:pointer;border-bottom:2px solid transparent;font-size:11px;font-weight:500;color:var(--muted);display:flex;align-items:center;gap:6px;letter-spacing:1.5px;text-transform:uppercase;font-family:var(--mono);transition:color .12s;white-space:nowrap}
+.tab:hover{color:var(--text)}
+.tab.active{color:var(--text);border-bottom-color:var(--accent)}
 .tab-icon{height:14px;width:14px;object-fit:contain;opacity:.5;filter:invert(1)}
 .tab.active .tab-icon{opacity:.9}
-.tab-divider{width:1px;background:var(--b2);margin:10px 4px;flex-shrink:0}
-.update-btn{margin-left:auto;background:var(--s2);border:1px solid var(--b2);color:var(--dim);padding:4px 10px;border-radius:3px;cursor:pointer;font-size:10px;font-family:var(--mono);transition:all .12s;white-space:nowrap;flex-shrink:0}
-.update-btn:hover{color:var(--text);border-color:#555}
+.tab-divider{width:1px;background:var(--panel-edge);margin:12px 4px;flex-shrink:0}
+
+.theme-picker{margin-left:auto;flex-shrink:0;background:transparent;border:1px solid var(--panel-edge);color:var(--muted);padding:5px 10px;font-size:10.5px;font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;cursor:pointer;flex-shrink:0}
+.theme-picker:hover{color:var(--text);border-color:var(--muted)}
+.theme-picker option{background:var(--panel);color:var(--text)}
+
+.update-btn{background:transparent;border:1px solid var(--panel-edge);color:var(--muted);padding:5px 12px;cursor:pointer;font-size:10.5px;font-family:var(--mono);letter-spacing:1px;text-transform:uppercase;transition:all .12s;white-space:nowrap;flex-shrink:0}
+.update-btn:hover{color:var(--text);border-color:var(--accent)}
+
 .drop-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);display:none;align-items:center;justify-content:center;z-index:100}
 .drop-overlay.show{display:flex}
-.drop-box{border:2px dashed #333;border-radius:8px;padding:48px 72px;text-align:center;pointer-events:none}
-.drop-box h2{font-size:18px;font-weight:600;margin-bottom:8px}
-.drop-box p{color:var(--dim);font-size:11px;font-family:var(--mono);margin-top:6px}
+.drop-box{border:2px dashed var(--panel-edge);padding:48px 72px;text-align:center;pointer-events:none}
+.drop-box h2{font-family:var(--display);font-size:20px;font-weight:600;margin-bottom:8px;letter-spacing:.3px}
+.drop-box p{color:var(--muted);font-size:11px;font-family:var(--mono);margin-top:6px}
+
 .main{flex:1;overflow:auto;padding:20px}
 .page{display:none}.page.active{display:block}
 .role-panel{display:none}.role-panel.active{display:block}
 .role-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}
 .side-col{display:flex;flex-direction:column;gap:8px}
-.side-label{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1px;padding:4px 0;display:flex;align-items:center;gap:7px}
+.side-label{font-family:var(--mono);font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:1.5px;padding:4px 0;display:flex;align-items:center;gap:7px}
 .faction-icon{height:18px;width:18px;object-fit:contain;opacity:.8}
 .ins-label{color:var(--ins)}.sec-label{color:var(--sec)}
-.card{background:var(--s1);border:1px solid var(--b1);border-radius:5px;overflow:hidden}
-.card-header{padding:12px 14px 10px;border-bottom:1px solid var(--b1)}
-.card-title{font-size:14px;font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:8px}
+.card{background:var(--panel);border:1px solid var(--panel-edge);overflow:hidden}
+.card-header{padding:12px 14px 10px;border-bottom:1px solid var(--panel-edge)}
+.card-title{font-family:var(--display);font-size:16px;font-weight:600;margin-bottom:3px;display:flex;align-items:center;gap:8px;letter-spacing:.2px}
 .cls-icon{height:20px;width:20px;object-fit:contain;opacity:.7;filter:invert(1)}
-.card-desc{font-size:11px;color:var(--dim);margin-bottom:5px}
-.defaults{font-size:10px;color:#484848;font-family:var(--mono)}
-.tag{display:inline-block;font-size:9px;font-family:var(--mono);font-weight:600;padding:1px 6px;border-radius:3px;letter-spacing:.3px}
-.tag.sprint{background:#1a2a10;color:#4a8a20;border:1px solid #2a4a18}
-.ammo-tag{font-size:9px;font-family:var(--mono);padding:1px 5px;border-radius:2px;color:#999;background:#1a1a1a;border:1px solid #2a2a2a;white-space:nowrap;margin-left:4px}
+.card-desc{font-size:11.5px;color:var(--muted);margin-bottom:5px}
+.defaults{font-size:10px;color:var(--muted);font-family:var(--mono)}
+.tag{display:inline-block;font-size:9px;font-family:var(--mono);font-weight:600;padding:1px 6px;letter-spacing:.5px;text-transform:uppercase}
+.tag.sprint{background:var(--accent-soft);color:var(--win);border:1px solid var(--panel-edge)}
+.ammo-tag{font-size:9px;font-family:var(--mono);padding:1px 5px;color:var(--muted);background:var(--accent-soft2);border:1px solid var(--panel-edge);white-space:nowrap;margin-left:4px;letter-spacing:.3px}
 .weapon-table{width:100%;border-collapse:collapse;font-size:11px}
-.weapon-table th{background:var(--s2);color:var(--dim);font-weight:500;font-size:9px;text-transform:uppercase;letter-spacing:.5px;padding:5px 8px;text-align:right;border-bottom:1px solid var(--b1);font-family:var(--mono)}
+.weapon-table th{background:var(--accent-soft2);color:var(--muted);font-weight:500;font-size:9px;text-transform:uppercase;letter-spacing:1px;padding:5px 8px;text-align:right;border-bottom:1px solid var(--panel-edge);font-family:var(--mono)}
 .weapon-table th.left{text-align:left}
-.weapon-table td{padding:5px 8px;border-bottom:1px solid #111;vertical-align:middle}
-.weapon-table tr:hover td{background:#141414}
+.weapon-table td{padding:5px 8px;border-bottom:1px solid var(--panel-edge);vertical-align:middle}
+.weapon-table tr:hover td{background:var(--accent-soft2)}
 .weapon-table tr:last-child td{border-bottom:none}
 tr.dim-row td:not(.wn){opacity:.45}tr.dim-row:hover td:not(.wn){opacity:.75}
 .wi,.wicon,.gi,.cls-icon,.tab-icon,.faction-icon{mix-blend-mode:screen}
-tr.section-sep td{background:var(--s2);color:var(--dim);font-family:var(--mono);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;padding:4px 8px;border-top:1px solid var(--b1)}
+tr.section-sep td{background:var(--accent-soft2);color:var(--muted);font-family:var(--mono);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;padding:4px 8px;border-top:1px solid var(--panel-edge)}
 td.wn{display:flex;align-items:center;gap:6px;white-space:nowrap}
 .wi{height:18px;width:auto;max-width:56px;object-fit:contain;opacity:.6;flex-shrink:0;transition:opacity .12s}
 tr:hover .wi{opacity:.9}
 .wi-ph{width:32px;height:18px;flex-shrink:0;display:inline-block}
 td.wn span{font-weight:500}
-td.cost{text-align:right;font-family:var(--mono);font-weight:700;color:var(--ins);font-size:12px}
-td.stat{text-align:right;font-family:var(--mono);font-size:11px;color:#666}
+td.cost{text-align:right;font-family:var(--mono);font-weight:700;color:var(--accent);font-size:12px}
+td.stat{text-align:right;font-family:var(--mono);font-size:11px;color:var(--muted)}
 td.stat.hi{color:var(--text);font-weight:500}
-.gren-section{border-top:1px solid var(--b1);background:var(--s2);padding:8px 14px}
-.gren-label{font-family:var(--mono);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:.8px;color:var(--dim);margin-bottom:6px}
+.gren-section{border-top:1px solid var(--panel-edge);background:var(--accent-soft2);padding:8px 14px}
+.gren-label{font-family:var(--mono);font-size:9px;font-weight:600;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);margin-bottom:6px}
 .gren-list{display:flex;flex-wrap:wrap;gap:6px}
-.gren-item{display:flex;align-items:center;gap:5px;background:var(--b1);border:1px solid var(--b2);border-radius:3px;padding:3px 8px}
-.gren-type{font-family:var(--mono);font-size:9px;font-weight:600;padding:1px 5px;border-radius:2px;color:#ccc;text-transform:uppercase;letter-spacing:.3px}
+.gren-item{display:flex;align-items:center;gap:5px;background:var(--panel);border:1px solid var(--panel-edge);padding:3px 8px}
+.gren-type{font-family:var(--mono);font-size:9px;font-weight:600;padding:1px 5px;color:var(--text);text-transform:uppercase;letter-spacing:.5px}
 .gi{height:16px;width:auto;max-width:24px;object-fit:contain;opacity:.7}
 .gren-name{font-size:11px;font-weight:500;color:var(--text)}
-.gren-cost{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--ins);margin-left:3px}
+.gren-cost{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--accent);margin-left:3px}
 .ammo-page-wrap{max-width:900px}
 .damage-page-wrap{max-width:1100px}
 
-:root{
-  --bg:#090909; --s1:#111; --s2:#171717; --s3:#1d1d1d;
-  --b1:#222; --b2:#2a2a2a; --b3:#333;
-  --text:#d0d0d0; --dim:#555; --muted:#383838;
-  --hi:#e0e0e0; --red:#c03030; --orange:#c07830; --green:#308050; --blue:#3070b0;
-  --accent:#c0392b;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-html,body{height:100%;overflow:hidden}
-body{background:var(--bg);color:var(--text);font-family:'Inter',sans-serif;font-size:13px;display:flex;flex-direction:column}
-
-/* Header */
-header{display:flex;align-items:center;height:44px;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0;gap:0}
-.logo{padding:0 20px;display:flex;align-items:center;gap:8px;border-right:1px solid var(--b1);height:100%}
-.lt{font-size:13px;font-weight:600;letter-spacing:.2px}
-.lt em{color:var(--accent);font-style:normal}
-.ls{font-size:10px;color:var(--dim);font-family:'JetBrains Mono',monospace}
-nav{display:flex;height:100%}
-.tab{padding:0 18px;cursor:pointer;border-bottom:2px solid transparent;font-size:11px;font-weight:500;color:var(--dim);display:flex;align-items:center;letter-spacing:.4px;text-transform:uppercase;transition:color .12s}
-.tab:hover{color:var(--text)}
-.tab.active{color:var(--text);border-bottom-color:var(--accent)}
-.hright{display:flex;align-items:center;gap:8px;padding:0 16px;margin-left:auto;border-left:1px solid var(--b1);height:100%}
-input{background:var(--s2);border:1px solid var(--b2);color:var(--text);padding:5px 10px;border-radius:4px;font-size:11px;font-family:'JetBrains Mono',monospace;width:180px;outline:none}
-input:focus{border-color:var(--b3)}
-input::placeholder{color:var(--muted)}
-
-/* Layout */
-.panels{flex:1;overflow:hidden;display:flex;flex-direction:column}
-.panel{display:none;flex:1;overflow:hidden;flex-direction:column}
-.panel.active{display:flex}
-
 /* Filter bar */
-.fbar{display:flex;gap:4px;padding:7px 14px;background:var(--s1);border-bottom:1px solid var(--b1);flex-shrink:0;flex-wrap:wrap}
-.fb{background:transparent;border:1px solid var(--b1);color:var(--dim);padding:2px 9px;border-radius:3px;cursor:pointer;font-size:10px;font-family:'JetBrains Mono',monospace;letter-spacing:.3px;text-transform:uppercase;transition:all .1s}
-.fb:hover{color:var(--text);border-color:var(--b2)}
-.fb.on{background:var(--accent);border-color:var(--accent);color:#fff}
+input{background:var(--panel);border:1px solid var(--panel-edge);color:var(--text);padding:5px 10px;font-size:11px;font-family:var(--mono);width:180px;outline:none}
+input:focus{border-color:var(--accent)}
+input::placeholder{color:var(--muted)}
+.fbar{display:flex;gap:4px;padding:7px 14px;background:var(--panel);border-bottom:1px solid var(--panel-edge);flex-shrink:0;flex-wrap:wrap}
+.fb{background:transparent;border:1px solid var(--panel-edge);color:var(--muted);padding:2px 9px;cursor:pointer;font-size:10px;font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase;transition:all .1s}
+.fb:hover{color:var(--text);border-color:var(--muted)}
+.fb.on{background:var(--accent);border-color:var(--accent);color:var(--bg)}
 
 /* Table */
 .tw{flex:1;overflow:auto}
 table{width:100%;border-collapse:collapse;font-size:12px}
 thead{position:sticky;top:0;z-index:10}
-th{background:var(--s2);color:var(--dim);font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:.5px;padding:7px 10px;text-align:right;border-bottom:1px solid var(--b1);white-space:nowrap;font-family:'JetBrains Mono',monospace}
+th{background:var(--accent-soft2);color:var(--muted);font-weight:500;font-size:10px;text-transform:uppercase;letter-spacing:1px;padding:7px 10px;text-align:right;border-bottom:1px solid var(--panel-edge);white-space:nowrap;font-family:var(--mono)}
 th.l{text-align:left}
-td{padding:6px 10px;border-bottom:1px solid #141414;vertical-align:middle}
-tr:hover td{background:#121212}
-tr.cat-row td{background:var(--s2);color:var(--dim);font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:1.2px;padding:5px 10px;border-top:2px solid var(--b1)}
+td{padding:6px 10px;border-bottom:1px solid var(--panel-edge);vertical-align:middle}
+tr:hover td{background:var(--accent-soft2)}
+tr.cat-row td{background:var(--accent-soft2);color:var(--muted);font-family:var(--mono);font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:1.5px;padding:5px 10px;border-top:2px solid var(--panel-edge)}
 .cc{color:var(--muted);font-weight:400;margin-left:5px}
 
 /* Weapon cells */
@@ -123,154 +144,184 @@ td.wname{display:flex;align-items:center;gap:9px;white-space:nowrap;min-width:16
 .wicon{height:20px;width:auto;max-width:64px;object-fit:contain;opacity:.6;flex-shrink:0;transition:opacity .12s}
 tr:hover .wicon{opacity:.9}
 td.wname span{font-weight:500}
-td.n{text-align:right;font-family:'JetBrains Mono',monospace;font-size:11px;color:#666}
-td.n.hi{color:var(--hi)}
-td.n.dim{color:#444}
+td.n{text-align:right;font-family:var(--mono);font-size:11px;color:var(--muted)}
+td.n.hi{color:var(--text)}
+td.n.dim{color:var(--muted);opacity:.6}
 td.n.orange{color:var(--orange)}
-td.cost{text-align:right;font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:600;color:var(--accent)}
-td.modes{text-align:center;font-family:'JetBrains Mono',monospace;font-size:10px;color:#555}
+td.cost{text-align:right;font-family:var(--mono);font-size:12px;font-weight:600;color:var(--accent)}
+td.modes{text-align:center;font-family:var(--mono);font-size:10px;color:var(--muted)}
 
 /* Ammo cell — inline in weapon row */
 td.ammo-cell{min-width:200px;white-space:nowrap}
-.mag-caps{font-family:'JetBrains Mono',monospace;font-size:10px;color:#444;margin-right:6px}
-.ammo-pill{display:inline-block;padding:1px 6px;border-radius:3px;font-size:10px;font-family:'JetBrains Mono',monospace;cursor:pointer;user-select:none;transition:opacity .1s;margin-right:3px;font-weight:500}
-.pill-std{background:#0d1a10;color:#3a8050;border:1px solid #162a1a}
-.pill-hi{background:#1a1000;color:#906020;border:1px solid #2a1a00}
+.mag-caps{font-family:var(--mono);font-size:10px;color:var(--muted);margin-right:6px}
+.ammo-pill{display:inline-block;padding:1px 6px;font-size:10px;font-family:var(--mono);cursor:pointer;user-select:none;transition:opacity .1s;margin-right:3px;font-weight:500;letter-spacing:.3px;text-transform:uppercase}
+.pill-std{background:var(--accent-soft2);color:var(--win);border:1px solid var(--panel-edge)}
+.pill-hi{background:var(--accent-soft2);color:var(--orange);border:1px solid var(--panel-edge)}
 .ammo-pill:hover{opacity:.6}
 
 /* Ammo table */
 td.aname{font-weight:500;min-width:140px}
-td.note-cell{color:var(--dim);font-size:11px;min-width:200px}
+td.note-cell{color:var(--muted);font-size:11px;min-width:200px}
 
 /* Damage grid */
 .dg{display:grid;grid-template-columns:repeat(3,1fr);height:100%;overflow:hidden}
-.dc{border-right:1px solid var(--b1);overflow:auto}
+.dc{border-right:1px solid var(--panel-edge);overflow:auto}
 .dc:last-child{border:none}
-.dct{padding:9px 14px;font-family:'JetBrains Mono',monospace;font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:.8px;color:var(--dim);border-bottom:1px solid var(--b1);background:var(--s2);position:sticky;top:0}
+.dct{padding:9px 14px;font-family:var(--mono);font-size:9px;font-weight:500;text-transform:uppercase;letter-spacing:1.2px;color:var(--muted);border-bottom:1px solid var(--panel-edge);background:var(--accent-soft2);position:sticky;top:0}
 td.dl{font-weight:500;white-space:nowrap;padding:7px 14px}
-td.dn{font-size:11px;color:var(--dim);padding:7px 14px}
+td.dn{font-size:11px;color:var(--muted);padding:7px 14px}
 td.flags{padding:7px 14px}
-.badge{display:inline-block;font-size:10px;font-family:'JetBrains Mono',monospace;color:#aaa;background:var(--bc);padding:1px 6px;border-radius:3px;margin-right:3px}
+.badge{display:inline-block;font-size:10px;font-family:var(--mono);color:var(--text);background:var(--bc);padding:1px 6px;margin-right:3px;letter-spacing:.3px;text-transform:uppercase}
 
 /* Tooltip */
-.tt{position:fixed;background:#0d0d0d;border:1px solid var(--b2);border-radius:5px;padding:12px 14px;font-size:12px;pointer-events:none;z-index:9999;max-width:230px;opacity:0;transition:opacity .1s;box-shadow:0 8px 32px rgba(0,0,0,.9)}
+.tt{position:fixed;background:var(--panel);border:1px solid var(--panel-edge);padding:12px 14px;font-size:12px;pointer-events:none;z-index:9999;max-width:230px;opacity:0;transition:opacity .1s;box-shadow:0 8px 32px rgba(0,0,0,.6)}
 .tt.show{opacity:1}
-.ttn{font-weight:600;margin-bottom:8px;font-size:13px}
-.ttr{display:flex;justify-content:space-between;gap:14px;padding:3px 0;border-bottom:1px solid #181818}
+.ttn{font-family:var(--display);font-weight:600;margin-bottom:8px;font-size:15px;letter-spacing:.2px}
+.ttr{display:flex;justify-content:space-between;gap:14px;padding:3px 0;border-bottom:1px solid var(--panel-edge)}
 .ttr:last-of-type{border:none}
-.ttk{color:var(--dim);font-size:11px}
-.ttv{font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:500}
-.ttnote{color:var(--dim);font-size:10px;margin-top:6px;padding-top:6px;border-top:1px solid #181818;line-height:1.5}
-.ttgo{color:var(--blue);font-size:10px;margin-top:5px;font-family:'JetBrains Mono',monospace;cursor:pointer;pointer-events:all}
+.ttk{color:var(--muted);font-size:11px}
+.ttv{font-family:var(--mono);font-size:11px;font-weight:500}
+.ttnote{color:var(--muted);font-size:10px;margin-top:6px;padding-top:6px;border-top:1px solid var(--panel-edge);line-height:1.5}
+.ttgo{color:var(--blue);font-size:10px;margin-top:5px;font-family:var(--mono);cursor:pointer;pointer-events:all;text-transform:uppercase;letter-spacing:.5px}
 .ttgo:hover{opacity:.7}
 
-.ammo-tooltip{position:fixed;display:none;background:#101010;border:1px solid #2a2a2a;border-radius:5px;padding:12px 14px;min-width:220px;z-index:9999;pointer-events:none;font-family:'Inter',sans-serif}
-.tt-title{font-size:12px;font-weight:600;color:#d0d0d0;margin-bottom:8px}
+.ammo-tooltip{position:fixed;display:none;background:var(--panel);border:1px solid var(--panel-edge);padding:12px 14px;min-width:220px;z-index:9999;pointer-events:none;font-family:var(--cond)}
+.tt-title{font-family:var(--display);font-size:14px;font-weight:600;color:var(--text);margin-bottom:8px;letter-spacing:.2px}
 .tt-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:8px}
-.tt-cell{background:#161616;border-radius:3px;padding:6px 8px}
-.tt-label{font-size:9px;font-family:'JetBrains Mono',monospace;color:#555;text-transform:uppercase;letter-spacing:.5px;margin-bottom:2px}
-.tt-val{font-size:14px;font-weight:600;color:#d0d0d0}
-.tt-rows{border-top:1px solid #1e1e1e;padding-top:7px;display:flex;flex-direction:column;gap:4px}
+.tt-cell{background:var(--accent-soft2);padding:6px 8px}
+.tt-label{font-size:9px;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:2px}
+.tt-val{font-size:14px;font-weight:600;color:var(--text)}
+.tt-rows{border-top:1px solid var(--panel-edge);padding-top:7px;display:flex;flex-direction:column;gap:4px}
 .tt-row{display:flex;justify-content:space-between;font-size:11px}
-.tt-row-label{color:#555}
-.tt-row-val{font-family:'JetBrains Mono',monospace;color:#d0d0d0}
-.good{color:#4a8a20!important}
-.bad{color:#c0392b!important}
-.warn{color:#c07030!important}
+.tt-row-label{color:var(--muted)}
+.tt-row-val{font-family:var(--mono);color:var(--text)}
+.good{color:var(--win)!important}
+.bad{color:var(--loss)!important}
+.warn{color:var(--orange)!important}
 
 
 /* ── Editor Panel ── */
-#edit-panel{position:fixed;right:-340px;top:0;width:320px;height:100%;background:#111;border-left:1px solid #1e1e1e;z-index:200;display:flex;flex-direction:column;transition:right .2s ease;box-shadow:-8px 0 32px rgba(0,0,0,.6)}
+#edit-panel{position:fixed;right:-340px;top:0;width:320px;height:100%;background:var(--panel);border-left:1px solid var(--panel-edge);z-index:200;display:flex;flex-direction:column;transition:right .2s ease;box-shadow:-8px 0 32px rgba(0,0,0,.5)}
 #edit-panel.open{right:0}
-#ep-header{padding:12px 14px;border-bottom:1px solid #1e1e1e;display:flex;align-items:center;gap:8px;flex-shrink:0}
-#ep-title{font-size:12px;font-weight:600;color:#d0d0d0;font-family:'JetBrains Mono',monospace;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-#ep-close{background:none;border:none;color:#444;font-size:16px;cursor:pointer;padding:2px 6px;line-height:1}
-#ep-close:hover{color:#d0d0d0}
+#ep-header{padding:12px 14px;border-bottom:1px solid var(--panel-edge);display:flex;align-items:center;gap:8px;flex-shrink:0}
+#ep-title{font-size:12px;font-weight:600;color:var(--text);font-family:var(--mono);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#ep-close{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:2px 6px;line-height:1}
+#ep-close:hover{color:var(--text)}
 #ep-body{flex:1;overflow-y:auto;padding:14px}
 .ep-field{margin-bottom:14px}
-.ep-label{font-size:9px;font-family:'JetBrains Mono',monospace;text-transform:uppercase;letter-spacing:.8px;color:#444;margin-bottom:5px}
-.ep-input{width:100%;background:#0d0d0d;border:1px solid #222;color:#d0d0d0;padding:6px 8px;border-radius:3px;font-size:12px;font-family:'JetBrains Mono',monospace;outline:none}
-.ep-input:focus{border-color:#333}
-.ep-input option{background:#0d0d0d;color:#d0d0d0}
-#ep-icon-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;max-height:260px;overflow-y:auto;background:#0a0a0a;border:1px solid #1e1e1e;border-radius:3px;padding:6px}
-.ep-icon-btn{background:#111;border:1px solid #1e1e1e;border-radius:3px;padding:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;height:34px;box-sizing:border-box}
-.ep-icon-btn:hover{border-color:#333;background:#161616}
-.ep-icon-btn.selected{border-color:#c0392b;background:#1a0808}
+.ep-label{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:5px}
+.ep-input{width:100%;background:var(--bg);border:1px solid var(--panel-edge);color:var(--text);padding:6px 8px;font-size:12px;font-family:var(--mono);outline:none}
+.ep-input:focus{border-color:var(--accent)}
+.ep-input option{background:var(--bg);color:var(--text)}
+#ep-icon-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:4px;max-height:260px;overflow-y:auto;background:var(--bg);border:1px solid var(--panel-edge);padding:6px}
+.ep-icon-btn{background:var(--panel);border:1px solid var(--panel-edge);padding:4px;cursor:pointer;display:flex;align-items:center;justify-content:center;height:34px;box-sizing:border-box}
+.ep-icon-btn:hover{border-color:var(--muted);background:var(--accent-soft2)}
+.ep-icon-btn.selected{border-color:var(--accent);background:var(--accent-soft)}
 .ep-icon-btn img{height:18px;width:auto;max-width:34px;object-fit:contain;opacity:.6;filter:invert(1)}
 .ep-icon-btn.selected img{opacity:1}
-#ep-footer{padding:10px 14px;border-top:1px solid #1e1e1e;display:flex;gap:6px;flex-shrink:0}
-.ep-btn{flex:1;padding:6px;border-radius:3px;font-size:11px;font-family:'JetBrains Mono',monospace;cursor:pointer;border:1px solid #222}
-.ep-save{background:#c0392b;border-color:#c0392b;color:#fff;font-weight:600}
-.ep-save:hover{background:#a0291b}
-.ep-reset{background:transparent;color:#444}
-.ep-reset:hover{color:#d0d0d0;border-color:#333}
-.ep-override-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid #141414;align-items:center;font-size:10px;font-family:'JetBrains Mono',monospace}
-.ep-override-row .ep-ov-name{color:#666;flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.ep-override-row .ep-ov-val{color:#444;margin:0 6px}
-.ep-del{background:none;border:none;color:#333;cursor:pointer;font-size:12px;padding:0 4px;flex-shrink:0}
-.ep-del:hover{color:#c0392b}
+#ep-footer{padding:10px 14px;border-top:1px solid var(--panel-edge);display:flex;gap:6px;flex-shrink:0}
+.ep-btn{flex:1;padding:6px;font-size:11px;font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase;cursor:pointer;border:1px solid var(--panel-edge)}
+.ep-save{background:var(--accent);border-color:var(--accent);color:var(--bg);font-weight:600}
+.ep-save:hover{opacity:.85}
+.ep-reset{background:transparent;color:var(--muted)}
+.ep-reset:hover{color:var(--text);border-color:var(--muted)}
+.ep-override-row{display:flex;justify-content:space-between;padding:4px 0;border-bottom:1px solid var(--panel-edge);align-items:center;font-size:10px;font-family:var(--mono)}
+.ep-override-row .ep-ov-name{color:var(--muted);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.ep-override-row .ep-ov-val{color:var(--muted);margin:0 6px}
+.ep-del{background:none;border:none;color:var(--muted);cursor:pointer;font-size:12px;padding:0 4px;flex-shrink:0}
+.ep-del:hover{color:var(--loss)}
 #edit-panel-bg{display:none;position:fixed;inset:0;z-index:199}
 #edit-panel.open ~ #edit-panel-bg{display:block}
 
 #push-confirm{display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);z-index:300;align-items:center;justify-content:center;}
 #push-confirm.show{display:flex;}
-#push-confirm-box{background:#161616;border:1px solid #2a2a2a;border-radius:6px;padding:24px 28px;min-width:320px;font-family:'JetBrains Mono',monospace;}
-#push-confirm-box h3{font-size:13px;font-weight:600;margin-bottom:8px;color:#d0d0d0;}
-#push-confirm-box p{font-size:11px;color:#555;margin-bottom:16px;line-height:1.6;}
+#push-confirm-box{background:var(--panel);border:1px solid var(--panel-edge);padding:24px 28px;min-width:320px;font-family:var(--mono);}
+#push-confirm-box h3{font-family:var(--display);font-size:15px;font-weight:600;margin-bottom:8px;color:var(--text);letter-spacing:.2px}
+#push-confirm-box p{font-size:11px;color:var(--muted);margin-bottom:16px;line-height:1.6;}
 #push-confirm-box .btn-row{display:flex;gap:8px;justify-content:flex-end;}
-#push-confirm-box button{background:var(--s2);border:1px solid var(--b2);color:var(--dim);padding:5px 14px;border-radius:3px;cursor:pointer;font-size:10px;font-family:'JetBrains Mono',monospace;transition:all .12s;}
-#push-confirm-box button:hover{color:var(--text);border-color:#555;}
-#push-confirm-box button.primary{background:#1a3a1a;border-color:#2a5a2a;color:#4a9a4a;}
-#push-confirm-box button.primary:hover{background:#1e451e;color:#5ab05a;}
-#push-status{font-size:10px;margin-top:10px;color:#555;text-align:right;min-height:14px;}
+#push-confirm-box button{background:transparent;border:1px solid var(--panel-edge);color:var(--muted);padding:5px 14px;cursor:pointer;font-size:10px;font-family:var(--mono);letter-spacing:.5px;text-transform:uppercase;transition:all .12s;}
+#push-confirm-box button:hover{color:var(--text);border-color:var(--muted);}
+#push-confirm-box button.primary{background:var(--accent-soft);border-color:var(--win);color:var(--win);}
+#push-confirm-box button.primary:hover{background:var(--accent-soft2);}
+#push-status{font-size:10px;margin-top:10px;color:var(--muted);text-align:right;min-height:14px;}
+
+/* ── Ammo/Damage review + generic row editor ── */
+.ammo-review-row{background:var(--accent-soft2);box-shadow:inset 3px 0 0 var(--accent)}
+.review-banner{background:var(--accent-soft);border:1px solid var(--accent);color:var(--accent);font-family:var(--mono);font-size:11px;letter-spacing:.3px;padding:8px 12px;margin-bottom:10px}
+
+#row-edit-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);align-items:center;justify-content:center}
+#row-edit-overlay.open{display:flex}
+#row-edit-box{background:var(--panel);border:1px solid var(--panel-edge);width:380px;max-width:92vw;max-height:86vh;overflow-y:auto;box-shadow:0 24px 80px rgba(0,0,0,.7)}
+#re-header{padding:12px 14px;border-bottom:1px solid var(--panel-edge);display:flex;align-items:center;gap:8px}
+#re-title{font-family:var(--mono);font-size:12px;font-weight:600;color:var(--text);flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#re-close{background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;padding:2px 6px;line-height:1}
+#re-close:hover{color:var(--text)}
+#re-body{padding:14px}
+.re-field{margin-bottom:12px}
+.re-label{font-size:9px;font-family:var(--mono);text-transform:uppercase;letter-spacing:1px;color:var(--muted);margin-bottom:5px}
+.re-input{width:100%;background:var(--bg);border:1px solid var(--panel-edge);color:var(--text);padding:6px 8px;font-size:12px;font-family:var(--mono);outline:none}
+.re-input:focus{border-color:var(--accent)}
+#re-footer{padding:10px 14px;border-top:1px solid var(--panel-edge);display:flex;align-items:center;gap:8px}
+#re-verify-row{display:flex;align-items:center;gap:6px;font-size:10px;font-family:var(--mono);color:var(--muted);text-transform:uppercase;letter-spacing:.5px;cursor:pointer}
 
 /* ── WEAPON DETAIL MODAL ────────────────────────────────────────────────── */
 #wdm-overlay{display:none;position:fixed;inset:0;z-index:300;background:rgba(0,0,0,.75);backdrop-filter:blur(4px);align-items:center;justify-content:center}
 #wdm-overlay.open{display:flex}
-#wdm-box{position:relative;display:flex;max-width:920px;width:95vw;max-height:90vh;background:#111;border:1px solid #1e1e1e;border-radius:4px;overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.8)}
-#wdm-stats{flex:1;min-width:0;overflow-y:auto;padding:24px 28px;border-right:1px solid #1a1a1a}
-#wdm-edit{width:300px;flex-shrink:0;overflow-y:auto;background:#0d0d0d}
-#wdm-close{position:absolute;top:12px;right:12px;background:none;border:none;color:#444;font-size:16px;cursor:pointer;z-index:10;padding:4px 8px;line-height:1}
-#wdm-close:hover{color:#aaa}
+#wdm-box{position:relative;display:flex;max-width:920px;width:95vw;max-height:90vh;background:var(--panel);border:1px solid var(--panel-edge);overflow:hidden;box-shadow:0 24px 80px rgba(0,0,0,.7)}
+#wdm-stats{flex:1;min-width:0;overflow-y:auto;padding:24px 28px;border-right:1px solid var(--panel-edge)}
+#wdm-edit{width:300px;flex-shrink:0;overflow-y:auto;background:var(--bg)}
+#wdm-close{position:absolute;top:12px;right:12px;background:none;border:none;color:var(--muted);font-size:16px;cursor:pointer;z-index:10;padding:4px 8px;line-height:1}
+#wdm-close:hover{color:var(--text)}
 .wdm-header{display:flex;align-items:center;gap:16px;margin-bottom:20px}
 .wdm-icon{width:64px;height:40px;object-fit:contain;mix-blend-mode:screen;flex-shrink:0}
 .wdm-icon-ph{width:64px;height:40px;flex-shrink:0}
-.wdm-title{font-size:18px;font-weight:700;color:#e0e0e0;letter-spacing:.5px}
-.wdm-sub{font-size:11px;color:#333;font-family:'JetBrains Mono',monospace;margin-top:3px}
-.wdm-ammo-banner{display:flex;align-items:center;gap:10px;padding:10px 14px;background:#0a0a0a;border:1px solid #1a1a1a;border-radius:3px;margin-bottom:18px}
-.wdm-ammo-name{font-size:12px;font-weight:600;color:#bbb;font-family:'JetBrains Mono',monospace}
-.wdm-ammo-mv{font-size:11px;color:#444;font-family:'JetBrains Mono',monospace;margin-left:auto}
-.wdm-dmg-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:#1a1a1a;border:1px solid #1a1a1a;border-radius:3px;margin-bottom:16px;overflow:hidden}
-.wdm-dmg-cell{background:#0d0d0d;padding:12px 14px}
-.wdm-dmg-label{font-size:10px;color:#444;text-transform:uppercase;letter-spacing:.8px;margin-bottom:4px}
-.wdm-dmg-val{font-size:26px;font-weight:700;color:#e0e0e0;font-family:'JetBrains Mono',monospace;line-height:1}
+.wdm-title{font-family:var(--display);font-size:22px;font-weight:600;color:var(--text);letter-spacing:.3px}
+.wdm-sub{font-size:11px;color:var(--muted);font-family:var(--mono);margin-top:3px}
+.wdm-ammo-banner{display:flex;align-items:center;gap:10px;padding:10px 14px;background:var(--accent-soft2);border:1px solid var(--panel-edge);margin-bottom:18px}
+.wdm-ammo-name{font-size:12px;font-weight:600;color:var(--text);font-family:var(--mono)}
+.wdm-ammo-mv{font-size:11px;color:var(--muted);font-family:var(--mono);margin-left:auto}
+.wdm-dmg-grid{display:grid;grid-template-columns:1fr 1fr;gap:1px;background:var(--panel-edge);border:1px solid var(--panel-edge);margin-bottom:16px;overflow:hidden}
+.wdm-dmg-cell{background:var(--bg);padding:12px 14px}
+.wdm-dmg-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px;font-family:var(--mono)}
+.wdm-dmg-val{font-family:var(--display);font-size:28px;font-weight:600;color:var(--text);line-height:1}
 .wdm-bar-wrap{margin-bottom:14px}
-.wdm-bar-label{font-size:10px;color:#333;text-transform:uppercase;letter-spacing:.8px;margin-bottom:5px;display:flex;justify-content:space-between}
-.wdm-bar-label span:last-child{color:#555}
-.wdm-bar-bg{height:4px;background:#1a1a1a;border-radius:2px;overflow:hidden}
-.wdm-bar-fill{height:100%;border-radius:2px;background:var(--accent)}
+.wdm-bar-label{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:5px;display:flex;justify-content:space-between;font-family:var(--mono)}
+.wdm-bar-label span:last-child{color:var(--muted)}
+.wdm-bar-bg{height:4px;background:var(--panel-edge);overflow:hidden}
+.wdm-bar-fill{height:100%;background:var(--accent)}
 .wdm-rows{margin-bottom:18px}
-.wdm-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #111}
+.wdm-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--panel-edge)}
 .wdm-row:last-child{border-bottom:none}
-.wdm-row-label{font-size:11px;color:#555}
-.wdm-row-val{font-size:11px;color:#bbb;font-family:'JetBrains Mono',monospace;font-weight:600}
-.wdm-row-val.good{color:#4caf50}
-.wdm-row-val.warn{color:#f39c12}
-.wdm-row-val.bad{color:#e74c3c}
-.wdm-section-title{font-size:10px;color:#2a2a2a;text-transform:uppercase;letter-spacing:.8px;margin:16px 0 8px;font-family:'JetBrains Mono',monospace}
+.wdm-row-label{font-size:11px;color:var(--muted)}
+.wdm-row-val{font-size:11px;color:var(--text);font-family:var(--mono);font-weight:600}
+.wdm-row-val.good{color:var(--win)}
+.wdm-row-val.warn{color:var(--orange)}
+.wdm-row-val.bad{color:var(--loss)}
+.wdm-section-title{font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:1.2px;margin:16px 0 8px;font-family:var(--mono)}
 .wdm-reload-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px}
-.wdm-reload-cell{background:#0a0a0a;border:1px solid #161616;border-radius:3px;padding:8px 10px}
-.wdm-reload-type{font-size:9px;color:#333;text-transform:uppercase;letter-spacing:.8px;margin-bottom:3px}
-.wdm-reload-val{font-size:13px;font-weight:700;color:#888;font-family:'JetBrains Mono',monospace}
+.wdm-reload-cell{background:var(--accent-soft2);border:1px solid var(--panel-edge);padding:8px 10px}
+.wdm-reload-type{font-size:9px;color:var(--muted);text-transform:uppercase;letter-spacing:1px;margin-bottom:3px;font-family:var(--mono)}
+.wdm-reload-val{font-size:14px;font-weight:600;color:var(--text);font-family:var(--mono)}
 .wdm-ammo-tags{display:flex;flex-wrap:wrap;gap:5px}
-.wdm-ammo-chip{font-size:9px;font-family:'JetBrains Mono',monospace;padding:2px 6px;border:1px solid #222;border-radius:2px;color:#444}
+.wdm-ammo-chip{font-size:9px;font-family:var(--mono);padding:2px 6px;border:1px solid var(--panel-edge);color:var(--muted);letter-spacing:.3px;text-transform:uppercase}
 #wdm-edit #edit-panel{position:static;width:100%;height:100%;right:auto;border-left:none;box-shadow:none;display:flex;flex-direction:column}
 #wdm-edit #edit-panel.open{right:auto}
+
+.wdm-chart-panel{margin-bottom:16px}
+.wdm-chart-host{position:relative;width:100%;height:130px}
+.wdm-chart-host svg.wdm-chart{width:100%;height:100%;overflow:visible}
+.wdm-chart-grid{stroke:var(--panel-edge);stroke-width:.3;vector-effect:non-scaling-stroke}
+.wdm-chart-axis{fill:var(--muted);font-size:3px;font-family:var(--mono)}
+.wdm-chart-line{fill:none;stroke:var(--accent);stroke-width:.7;vector-effect:non-scaling-stroke}
+.wdm-chart-crosshair{stroke:var(--panel-edge);stroke-width:.4;vector-effect:non-scaling-stroke;display:none}
+.wdm-chart-dot{r:1.4;fill:var(--accent);display:none;vector-effect:non-scaling-stroke}
+.wdm-chart-tip{position:absolute;background:var(--bg);border:1px solid var(--panel-edge);border-radius:3px;
+  padding:5px 8px;font-size:10px;font-family:var(--mono);pointer-events:none;display:none;white-space:nowrap;z-index:5;color:var(--text)}
 </style>
 </head>
 <body>
 <header>
-  <div>
+  <div class="logo-block">
     <div class="logo">RSPL2 — <em>Reference</em></div>
     <div class="logo-sub">Supply budget 15 · 5 roles</div>
   </div>
@@ -280,7 +331,8 @@ td.flags{padding:7px 14px}
     <div class="tab" onclick="showPage('ammo')">Ammo</div>
     <div class="tab" onclick="showPage('damage')">Damage</div>
   </nav>
-  <div id="admin-btns" style="display:flex;gap:8px;margin-left:auto;flex-shrink:0">
+  <select id="theme-picker" class="theme-picker" title="Theme"></select>
+  <div id="admin-btns" style="display:flex;gap:8px;flex-shrink:0">
     <button class="update-btn" onclick="document.getElementById('fileinput').click()">↑ Load JSON</button>
     <button id="push-btn" style="display:none" class="update-btn" onclick="confirmPush()">⬆ Push to GitHub</button>
   </div>
@@ -292,75 +344,34 @@ td.flags{padding:7px 14px}
     <div id="role-panels"></div>
   </div>
   <div class="page" id="page-ammo">
-    <div class="ammo-page-wrap"><div class="ammo-wrap"><table class="ammo-table">
-  <thead><tr>
-    <th class="l">Ammo</th>
-    <th title="Pen modifier">Pen</th>
-    <th title="Suppression per hit">Supp</th>
-    <th title="Pellet count">Pellets</th>
-    <th title="Max penetrations">MaxPen</th>
-    <th class="l">Notes</th>
-  </tr></thead>
-  <tbody><tr class="cat-row"><td colspan="6">Battle Rifle / Sniper</td></tr>
-<tr id="ammo-338LM"><td class="aname">.338 LM</td><td class="n" style="">1.0</td><td class="n">0.35</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-338LM_AP"><td class="aname">.338 LM</td><td class="n" style="color:var(--hi)">1.15</td><td class="n">0.35</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-762x51"><td class="aname">7.62x51mm NATO</td><td class="n" style="">1.0</td><td class="n">0.35</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-762x51_AP"><td class="aname">7.62x51mm NATO</td><td class="n" style="color:var(--hi)">1.5</td><td class="n">0.35</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-762x51_Nato"><td class="aname">7.62x51mm NATO</td><td class="n" style="">1.0</td><td class="n">0.35</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-762x51_Nato_AP"><td class="aname">7.62x51mm NATO</td><td class="n" style="color:var(--hi)">1.5</td><td class="n">0.35</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-762x54R"><td class="aname">7.62x54mmR</td><td class="n" style="">1.0</td><td class="n">0.35</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-762x54R_AP"><td class="aname">7.62x54mmR</td><td class="n" style="color:var(--hi)">1.5</td><td class="n">0.35</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr class="cat-row"><td colspan="6">Battle Rifle / Sniper</td></tr>
-<tr class="cat-row"><td colspan="6">Rifle</td></tr>
-<tr id="ammo-300Blk"><td class="aname">300 Blackout</td><td class="n" style="">1.0</td><td class="n">0.35</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-545x39"><td class="aname">5.45x39mm</td><td class="n" style="">1.0</td><td class="n">0.3</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-545x39_AP"><td class="aname">5.45x39mm</td><td class="n" style="color:var(--hi)">1.5</td><td class="n">0.3</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-556x45_Nato"><td class="aname">5.56x45mm NATO</td><td class="n" style="">1.0</td><td class="n">0.3</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-556x45_Nato_AP"><td class="aname">5.56x45mm NATO</td><td class="n" style="color:var(--hi)">1.5</td><td class="n">0.3</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-58x42"><td class="aname">5.8×42mm</td><td class="n" style="">1.0</td><td class="n">0.3</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-762x39"><td class="aname">7.62x39mm</td><td class="n" style="">1.0</td><td class="n">0.35</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-762x39_AP"><td class="aname">7.62x39mm</td><td class="n" style="color:var(--hi)">1.5</td><td class="n">0.35</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr class="cat-row"><td colspan="6">Rifle</td></tr>
-<tr class="cat-row"><td colspan="6">Pistol / SMG</td></tr>
-<tr id="ammo-357"><td class="aname">.357 Magnum</td><td class="n" style="">1.0</td><td class="n">0.3</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-357_AP"><td class="aname">.357 Magnum</td><td class="n" style="color:var(--hi)">1.5</td><td class="n">0.3</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-45acp"><td class="aname">.45 ACP</td><td class="n" style="">1.0</td><td class="n">0.3</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-45acp_AP"><td class="aname">.45 ACP</td><td class="n" style="color:var(--hi)">1.5</td><td class="n">0.3</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-46x30"><td class="aname">4.6x30mm</td><td class="n" style="">1.0</td><td class="n">0.3</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-46x30_AP"><td class="aname">4.6x30mm</td><td class="n" style="color:var(--hi)">1.5</td><td class="n">0.3</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-57x28"><td class="aname">5.7x28mm</td><td class="n" style="">1.0</td><td class="n">0.3</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-9x18"><td class="aname">9x18mm</td><td class="n" style="">1.0</td><td class="n">0.3</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-9x18_AP"><td class="aname">9x18mm</td><td class="n" style="color:var(--hi)">1.3</td><td class="n">0.3</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-9x19"><td class="aname">9x19mm</td><td class="n" style="">1.0</td><td class="n">0.3</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-9x19_AP"><td class="aname">9x19mm</td><td class="n" style="color:var(--hi)">5.0</td><td class="n">0.3</td><td class="n"></td><td class="n">5.0</td><td class="note-cell">Unusually high pen modifier (5.0)</td></tr>
-<tr class="cat-row"><td colspan="6">Pistol / SMG</td></tr>
-<tr class="cat-row"><td colspan="6">Subsonic</td></tr>
-<tr id="ammo-9x39_SP5"><td class="aname">9x39mm</td><td class="n" style="color:var(--hi)">5.5</td><td class="n">0.3</td><td class="n"></td><td class="n">5.0</td><td class="note-cell">AS VAL/VSS — extreme pen (5.5x)</td></tr>
-<tr class="cat-row"><td colspan="6">Subsonic</td></tr>
-<tr class="cat-row"><td colspan="6">Shotgun</td></tr>
-<tr id="ammo-12GA"><td class="aname">12 Gauge</td><td class="n" style="">1.0</td><td class="n">0.3</td><td class="n">8.0</td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-12GA_Flechette"><td class="aname">Flechettes</td><td class="n" style="color:var(--hi)">2.0</td><td class="n">0.3</td><td class="n">8.0</td><td class="n">5.0</td><td class="note-cell">2x pen vs standard 12GA</td></tr>
-<tr id="ammo-12GA_Slug"><td class="aname">Slugs</td><td class="n" style="">1.0</td><td class="n">0.3</td><td class="n"></td><td class="n">5.0</td><td class="note-cell">Single projectile, 0.1 spread</td></tr>
-<tr class="cat-row"><td colspan="6">Shotgun</td></tr>
-<tr class="cat-row"><td colspan="6">HMG / Anti-Material</td></tr>
-<tr id="ammo-127x108_AM"><td class="aname">12.7x108</td><td class="n" style="">1.0</td><td class="n">0.5</td><td class="n"></td><td class="n">3.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-50BMG_AM"><td class="aname">.50 BMG</td><td class="n" style="">1.0</td><td class="n">0.5</td><td class="n"></td><td class="n">4.0</td><td class="note-cell"></td></tr>
-<tr id="ammo-50ae"><td class="aname">.50 Action Express</td><td class="n" style="">1.0</td><td class="n">0.3</td><td class="n"></td><td class="n">5.0</td><td class="note-cell"></td></tr>
-<tr class="cat-row"><td colspan="6">HMG / Anti-Material</td></tr>
-</tbody>
-</table></div></div>
+    <div class="ammo-page-wrap">
+      <div id="ammo-review-banner"></div>
+      <div class="ammo-wrap"><table class="ammo-table">
+        <thead><tr>
+          <th class="l">Ammo</th>
+          <th title="Damage, close range">Dmg (close)</th>
+          <th title="Damage, long range">Dmg (long)</th>
+          <th title="Pen modifier">Pen</th>
+          <th title="Suppression per hit">Supp</th>
+          <th title="Pellet count">Pellets</th>
+          <th title="Max penetrations">MaxPen</th>
+          <th class="l">Notes</th>
+        </tr></thead>
+        <tbody id="ammo-tbody"></tbody>
+      </table></div>
+    </div>
   </div>
   <div class="page" id="page-damage">
-    <div class="damage-page-wrap">>
+    <div class="damage-page-wrap">
     <div class="dg">
       <div class="dc"><div class="dct">Player Stats</div>
-        <table><tbody><tr><td class="dl">Max Health</td><td class="n">100</td><td class="dn">All damage is relative to this</td></tr><tr><td class="dl">Max Stamina</td><td class="n">100</td><td class="dn"></td></tr><tr><td class="dl">Sprint Stamina Drain/s</td><td class="n">2.8</td><td class="dn"></td></tr><tr><td class="dl">Jump Stamina Cost</td><td class="n">5.0</td><td class="dn"></td></tr><tr><td class="dl">Slide Stamina Cost</td><td class="n">20.0</td><td class="dn"></td></tr><tr><td class="dl">Suppression Decay Rate/s</td><td class="n">0.16</td><td class="dn">How fast suppression wears off</td></tr><tr><td class="dl">Headshot Damage Scale</td><td class="n">5.0</td><td class="dn">Headshot = 5x damage</td></tr><tr><td class="dl">Crouch vs Explosives</td><td class="n">0.85</td><td class="dn">0.85 = 15% less explosive damage</td></tr><tr><td class="dl">Prone vs Explosives</td><td class="n">0.6</td><td class="dn">0.60 = 40% less explosive damage</td></tr><tr><td class="dl">Safe Fall Speed (UU/s)</td><td class="n">1150.0</td><td class="dn">No damage below this</td></tr><tr><td class="dl">Fatal Fall Speed (UU/s)</td><td class="n">1400.0</td><td class="dn">Instant death above this</td></tr><tr><td class="dl">Death Fade Time (s)</td><td class="n">2.0</td><td class="dn"></td></tr><tr><td class="dl">Death Fade Time Headshot (s)</td><td class="n">0.4</td><td class="dn">Faster screen fade on headshot kill</td></tr></tbody></table></div>
+        <table><tbody id="dmg-player-tbody"></tbody></table></div>
       <div class="dc"><div class="dct">Hitzone Multipliers</div>
         <table><thead><tr><th class="l">Zone</th><th>Dmg×</th><th>Vel×</th><th class="l">Notes</th></tr></thead>
-        <tbody><tr><td class="dl">Head</td><td class="n" style="color:var(--red);font-weight:600">5.0</td><td class="n dim">0.75</td><td class="dn">Instakill with any weapon doing 20+ base damage</td></tr><tr><td class="dl">Neck</td><td class="n" style="color:var(--orange);font-weight:600">2.5</td><td class="n dim">0.75</td><td class="dn"></td></tr><tr><td class="dl">Shoulder</td><td class="n" style="color:var(--hi);font-weight:600">1.0</td><td class="n dim">0.75</td><td class="dn"></td></tr><tr><td class="dl">Chest / Torso</td><td class="n" style="color:var(--hi);font-weight:600">1.0</td><td class="n dim">0.75</td><td class="dn">Default — no explicit override</td></tr><tr><td class="dl">Upper Arm</td><td class="n" style="color:var(--hi);font-weight:600">0.8</td><td class="n dim">0.75</td><td class="dn"></td></tr><tr><td class="dl">Forearm</td><td class="n" style="color:var(--hi);font-weight:600">0.7</td><td class="n dim">0.75</td><td class="dn"></td></tr><tr><td class="dl">Hand</td><td class="n" style="color:var(--green);font-weight:600">0.5</td><td class="n dim">0.75</td><td class="dn"></td></tr><tr><td class="dl">Thigh</td><td class="n" style="color:var(--hi);font-weight:600">0.8</td><td class="n dim">0.75</td><td class="dn"></td></tr><tr><td class="dl">Calf</td><td class="n" style="color:var(--green);font-weight:600">0.4</td><td class="n dim">0.75</td><td class="dn"></td></tr><tr><td class="dl">Foot</td><td class="n" style="color:var(--green);font-weight:600">0.3</td><td class="n dim">0.75</td><td class="dn"></td></tr></tbody></table></div>
+        <tbody id="dmg-hitzone-tbody"></tbody></table></div>
       <div class="dc"><div class="dct">Damage Types</div>
         <table><thead><tr><th class="l">Type</th><th class="l">Flags</th><th>Impulse</th><th>Obj×</th><th class="l">Notes</th></tr></thead>
-        <tbody><tr><td class="dl"><b>Explosion (Remote)</b></td><td class="flags"><span class="badge" style="--bc:#7a1a1a">Explosive</span></td><td class="n dim">12000.0</td><td class="n">1.0</td><td class="dn">IED / remote charges</td></tr><tr><td class="dl"><b>Bullet (Anti-Material)</b></td><td class="flags"></td><td class="n dim">800.0</td><td class="n">1.0</td><td class="dn">AM rifles — .50 BMG, 12.7x108</td></tr><tr><td class="dl"><b>Explosion (Grenade)</b></td><td class="flags"><span class="badge" style="--bc:#7a1a1a">Explosive</span></td><td class="n dim">12000.0</td><td class="n">1.0</td><td class="dn">Frag grenades</td></tr><tr><td class="dl"><b>Explosion (Rocket)</b></td><td class="flags"><span class="badge" style="--bc:#7a1a1a">Explosive</span></td><td class="n dim">16000.0</td><td class="n">2.0</td><td class="dn">RPG / AT4 — 2x objective damage</td></tr><tr><td class="dl"><b>Melee (Bash)</b></td><td class="flags"><span class="badge" style="--bc:#5a0a0a">Bypasses Armor</span></td><td class="n dim">800.0</td><td class="n">1.0</td><td class="dn">Weapon bash — ignores armor, 30x breakable damage</td></tr><tr><td class="dl"><b>Explosion (Chemical)</b></td><td class="flags"><span class="badge" style="--bc:#4a1a7a">Chemical</span><span class="badge" style="--bc:#0d4a3a">Drains Stamina</span></td><td class="n dim">0.0</td><td class="n">1.0</td><td class="dn">Chemical grenade — drains stamina, causes cough</td></tr><tr><td class="dl"><b>Explosion (Fire)</b></td><td class="flags"><span class="badge" style="--bc:#7a4010">Burns</span></td><td class="n dim">0.0</td><td class="n">1.0</td><td class="dn">Incendiary / thermite — applies burn DoT</td></tr><tr><td class="dl"><b>Explosion (Stun)</b></td><td class="flags"></td><td class="n dim">12000.0</td><td class="n">1.0</td><td class="dn">Flashbang — no blood, no pain sounds</td></tr><tr><td class="dl"><b>Melee (Punch)</b></td><td class="flags"><span class="badge" style="--bc:#5a0a0a">Bypasses Armor</span></td><td class="n dim">800.0</td><td class="n">1.0</td><td class="dn">Punch — ignores armor, 30x breakable damage</td></tr></tbody></table></div>
+        <tbody id="dmg-types-tbody"></tbody></table></div>
     </div>
   </div>
 </div>
@@ -378,7 +389,26 @@ td.flags{padding:7px 14px}
 <script src="data.js"></script>
 <script>
 const IS_ADMIN = new URLSearchParams(window.location.search).get('admin') === 'rspl2admin';
-if(!IS_ADMIN){ document.addEventListener('DOMContentLoaded',()=>{ ['edit-panel','edit-panel-bg'].forEach(id=>{const el=document.getElementById(id);if(el)el.remove();}); const ub=document.getElementById('admin-btns');if(ub)ub.remove(); }); }
+if(!IS_ADMIN){ document.addEventListener('DOMContentLoaded',()=>{ ['edit-panel','edit-panel-bg','row-edit-overlay'].forEach(id=>{const el=document.getElementById(id);if(el)el.remove();}); const ub=document.getElementById('admin-btns');if(ub)ub.remove(); }); }
+
+/* ── Theme picker, ported from splstats.net ── */
+const RSPL_THEMES = [
+  ['dust','Dust'], ['nightops','Night Ops'], ['coldsteel','Cold Steel'], ['ember','Ember'],
+  ['deepteal','Deep Teal'], ['gunmetal','Gunmetal'], ['odgreen','OD Green'], ['ash','Ash'],
+  ['crimson','Crimson'], ['glacier','Glacier'], ['nightshade','Nightshade'], ['bone','Bone']
+];
+document.addEventListener('DOMContentLoaded',()=>{
+  const sel = document.getElementById('theme-picker');
+  if(!sel) return;
+  sel.innerHTML = RSPL_THEMES.map(([id,label])=>`<option value="${id}">${label}</option>`).join('');
+  let current = 'dust';
+  try{ current = localStorage.getItem('rspl-theme') || document.documentElement.getAttribute('data-theme') || 'dust'; }catch(e){}
+  sel.value = current;
+  sel.addEventListener('change', ()=>{
+    document.documentElement.setAttribute('data-theme', sel.value);
+    try{ localStorage.setItem('rspl-theme', sel.value); }catch(e){}
+  });
+});
 
 
 
@@ -489,7 +519,7 @@ function classCard(c, side, role, wi, gi) {
       const gico = GREN_ICON_MAP[g.bp];
       const desc = (gi[g.bp]||{}).item_description||'';
       const weight = (gi[g.bp]||{}).weight||'';
-      return `<tr data-bp="${g.bp}" style="cursor:pointer" onclick="openWeaponModal('${g.bp}')"><td class="wn">${gico?`<img src="${gico}" class="wi">`:"<span class='wi-ph'></span>"}<span>${esc(name)}</span></td><td style="text-align:center;font-family:var(--mono);font-size:9px;font-weight:600;padding:5px 8px"><span style="background:${gc};padding:1px 5px;border-radius:2px;color:#ccc">${gt}</span></td><td class="cost">${g.cost}</td><td class="stat">${weight||'—'}</td><td class="stat" style="font-size:10px;color:#444;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(desc)}</td></tr>`;
+      return `<tr data-bp="${g.bp}" style="cursor:pointer" onclick="openWeaponModal('${g.bp}')"><td class="wn">${gico?`<img src="${gico}" class="wi">`:"<span class='wi-ph'></span>"}<span>${esc(name)}</span></td><td style="text-align:center;font-family:var(--mono);font-size:9px;font-weight:600;padding:5px 8px"><span style="background:${gc};padding:1px 5px;color:#ccc">${gt}</span></td><td class="cost">${g.cost}</td><td class="stat">${weight||'—'}</td><td class="stat" style="font-size:10px;color:#444;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(desc)}</td></tr>`;
     }).join('');
     grenHtml=`<div class="gren-section"><table class="weapon-table" style="width:100%"><thead><tr><th class="left">Grenade</th><th>Type</th><th>$</th><th>Wt</th><th class="left">Description</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
@@ -547,11 +577,231 @@ function showRole(role) {
   document.querySelectorAll('.role-panel').forEach(p=>p.classList.toggle('active',p.id==='role-'+role));
 }
 
+// ── AMMO PAGE (data-driven from AMMO_DATA/AMMO_LEGACY, admin-editable) ────
+function computeAmmoRow(key){
+  const ov = AO[key]||{};
+  if(ov._discarded) return null;
+  const inData = !!AMMO_DATA[key];
+  const base = inData ? AMMO_DATA[key] : (AMMO_LEGACY[key]||null);
+  if(!base) return null;
+  const row = {...base, ...ov, key};
+  row._legacy = !inData;
+  row._conflict = AMMO_CONFLICTS[key]||null;
+  row._verified = !!ov._verified;
+  row._hasOverride = Object.keys(ov).some(k=>k!=='_verified'&&k!=='_discarded');
+  return row;
+}
+
+function renderAmmoPage(){
+  const tbody = document.getElementById('ammo-tbody');
+  if(!tbody) return;
+  let reviewCount = 0;
+  const parts = [];
+  for(const cat of AMMO_CATEGORIES){
+    const keys = Object.keys(AMMO_CATEGORY_OF).filter(k=>AMMO_CATEGORY_OF[k]===cat);
+    const rows = keys.map(computeAmmoRow).filter(Boolean);
+    if(!rows.length) continue;
+    parts.push(`<tr class="cat-row"><td colspan="8">${esc(cat)}</td></tr>`);
+    for(const r of rows){
+      const needsReview = (r._legacy || r._conflict) && !r._verified;
+      if(needsReview) reviewCount++;
+      const rowClass = needsReview ? ' class="ammo-review-row"' : '';
+      const penHi = (r.pen!==undefined && r.pen>=1.5) ? ' style="color:var(--hi)"' : '';
+      const dmgClose = r.dmg_close!==undefined ? (r.pellets?`${r.dmg_close} × ${r.pellets}`:r.dmg_close) : '—';
+      const dmgLong = r.dmg_long!==undefined ? r.dmg_long : '—';
+      let note = r.note||'';
+      if(r._conflict && !r._verified) note = `⚠ Conflicts with AMMO_DATA (${r._conflict.field}: ${r._conflict.current} here vs ${r._conflict.old}) — ${r._conflict.note}`;
+      else if(r._legacy && !r._verified) note = note ? note+' — needs review (no AMMO_DATA entry)' : 'Needs review — no AMMO_DATA entry, unverified.';
+      const reviewTag = needsReview ? '<span class="tag" style="background:var(--accent-soft);color:var(--accent);margin-left:6px">Review</span>'
+        : (r._verified ? '<span class="tag" style="background:var(--accent-soft2);color:var(--win);margin-left:6px">Confirmed</span>'
+        : (r._hasOverride ? '<span class="tag" style="background:var(--accent-soft2);color:var(--win);margin-left:6px">Edited</span>' : ''));
+      const clickAttr = IS_ADMIN ? ` style="cursor:pointer" onclick="editAmmoRow('${r.key}')"` : '';
+      parts.push(`<tr id="ammo-${esc(r.key)}"${rowClass}${clickAttr}><td class="aname">${esc(r.name||r.key)}${reviewTag}</td><td class="n"${penHi}>${dmgClose}</td><td class="n">${dmgLong}</td><td class="n"${penHi}>${r.pen!==undefined?r.pen:'—'}</td><td class="n">${r.supp!==undefined?r.supp:'—'}</td><td class="n">${r.pellets||''}</td><td class="n">${r.maxpen!==undefined?r.maxpen:'—'}</td><td class="note-cell">${esc(note)}</td></tr>`);
+    }
+    parts.push(`<tr class="cat-row"><td colspan="8">${esc(cat)}</td></tr>`);
+  }
+  tbody.innerHTML = parts.join('');
+  const banner = document.getElementById('ammo-review-banner');
+  if(banner){
+    banner.innerHTML = reviewCount ? `<div class="review-banner">⚠ ${reviewCount} ammo ${reviewCount===1?'entry needs':'entries need'} review — no matching AMMO_DATA entry or a conflicting value. ${IS_ADMIN?'Click a flagged row to confirm or correct it.':'Open with ?admin=rspl2admin to resolve.'}</div>` : '';
+  }
+}
+
+function editAmmoRow(key){
+  if(!IS_ADMIN) return;
+  const row = computeAmmoRow(key);
+  if(!row) return;
+  const fields = [
+    {key:'name', label:'Display Name', type:'text', value:row.name},
+    {key:'dmg_close', label:'Damage (close)', type:'number', value:row.dmg_close},
+    {key:'dmg_long', label:'Damage (long)', type:'number', value:row.dmg_long},
+    {key:'pen', label:'Pen modifier', type:'number', value:row.pen},
+    {key:'supp', label:'Suppression', type:'number', value:row.supp},
+    {key:'pellets', label:'Pellets', type:'number', value:row.pellets},
+    {key:'maxpen', label:'Max penetrations', type:'number', value:row.maxpen},
+    {key:'note', label:'Notes', type:'text', value:row.note},
+  ];
+  const label = row._legacy ? `Ammo (unverified) — ${row.name||key}` : `Ammo — ${row.name||key}`;
+  openRowEditor('ammo', key, label, fields, row._legacy);
+}
+
+// ── DAMAGE PAGE (data-driven from PLAYER_STATS/HITZONE_DATA/DAMAGE_TYPES) ──
+function renderDamagePage(){
+  const editedTag = '<span class="tag" style="background:var(--accent-soft2);color:var(--win);margin-left:6px">Edited</span>';
+  const confirmedTag = '<span class="tag" style="background:var(--accent-soft2);color:var(--win);margin-left:6px">Confirmed</span>';
+
+  const pt = document.getElementById('dmg-player-tbody');
+  if(pt){
+    pt.innerHTML = PLAYER_STATS.map(s=>{
+      const ov = DO_['player.'+s.key]||{};
+      if(ov._discarded) return '';
+      const value = ov.value!==undefined?ov.value:s.value;
+      const note = ov.note!==undefined?ov.note:s.note;
+      const hasOv = Object.keys(ov).some(k=>k!=='_verified'&&k!=='_discarded');
+      const tag = ov._verified ? confirmedTag : (hasOv ? editedTag : '');
+      const clickAttr = IS_ADMIN ? ` style="cursor:pointer" onclick="editPlayerStat('${s.key}')"` : '';
+      return `<tr${clickAttr}><td class="dl">${esc(s.label)}${tag}</td><td class="n">${value}</td><td class="dn">${esc(note||'')}</td></tr>`;
+    }).join('');
+  }
+  const hz = document.getElementById('dmg-hitzone-tbody');
+  if(hz){
+    hz.innerHTML = HITZONE_DATA.map(h=>{
+      const ov = DO_['hitzone.'+h.key]||{};
+      if(ov._discarded) return '';
+      const dmg = ov.dmg!==undefined?ov.dmg:h.dmg;
+      const vel = ov.vel!==undefined?ov.vel:h.vel;
+      const note = ov.note!==undefined?ov.note:h.note;
+      const color = ov.color||h.color;
+      const hasOv = Object.keys(ov).some(k=>k!=='_verified'&&k!=='_discarded');
+      const tag = ov._verified ? confirmedTag : (hasOv ? editedTag : '');
+      const clickAttr = IS_ADMIN ? ` style="cursor:pointer" onclick="editHitzone('${h.key}')"` : '';
+      return `<tr${clickAttr}><td class="dl">${esc(h.zone)}${tag}</td><td class="n" style="color:var(--${color});font-weight:600">${dmg}</td><td class="n dim">${vel}</td><td class="dn">${esc(note||'')}</td></tr>`;
+    }).join('');
+  }
+  const dt = document.getElementById('dmg-types-tbody');
+  if(dt){
+    dt.innerHTML = DAMAGE_TYPES.map(d=>{
+      const ov = DO_['dtype.'+d.key]||{};
+      if(ov._discarded) return '';
+      const impulse = ov.impulse!==undefined?ov.impulse:d.impulse;
+      const objx = ov.objx!==undefined?ov.objx:d.objx;
+      const note = ov.note!==undefined?ov.note:d.note;
+      const flags = ov.flags!==undefined?ov.flags:d.flags;
+      const flagsHtml = (flags||[]).map(f=>`<span class="badge" style="--bc:${DAMAGE_TYPE_FLAG_COLORS[f]||'#333'}">${esc(f)}</span>`).join('');
+      const hasOv = Object.keys(ov).some(k=>k!=='_verified'&&k!=='_discarded');
+      const tag = ov._verified ? confirmedTag : (hasOv ? editedTag : '');
+      const clickAttr = IS_ADMIN ? ` style="cursor:pointer" onclick="editDamageType('${d.key}')"` : '';
+      return `<tr${clickAttr}><td class="dl"><b>${esc(d.type)}</b>${tag}</td><td class="flags">${flagsHtml}</td><td class="n dim">${impulse}</td><td class="n">${objx}</td><td class="dn">${esc(note||'')}</td></tr>`;
+    }).join('');
+  }
+}
+
+function editPlayerStat(key){
+  if(!IS_ADMIN) return;
+  const s = PLAYER_STATS.find(x=>x.key===key); if(!s) return;
+  const ov = DO_['player.'+key]||{};
+  const fields = [
+    {key:'value', label:'Value', type:'number', value: ov.value!==undefined?ov.value:s.value},
+    {key:'note', label:'Notes', type:'text', value: ov.note!==undefined?ov.note:s.note},
+  ];
+  openRowEditor('damage', 'player.'+key, `Player Stat — ${s.label}`, fields, false);
+}
+function editHitzone(key){
+  if(!IS_ADMIN) return;
+  const h = HITZONE_DATA.find(x=>x.key===key); if(!h) return;
+  const ov = DO_['hitzone.'+key]||{};
+  const fields = [
+    {key:'dmg', label:'Damage ×', type:'number', value: ov.dmg!==undefined?ov.dmg:h.dmg},
+    {key:'vel', label:'Velocity ×', type:'number', value: ov.vel!==undefined?ov.vel:h.vel},
+    {key:'note', label:'Notes', type:'text', value: ov.note!==undefined?ov.note:h.note},
+  ];
+  openRowEditor('damage', 'hitzone.'+key, `Hitzone — ${h.zone}`, fields, false);
+}
+function editDamageType(key){
+  if(!IS_ADMIN) return;
+  const d = DAMAGE_TYPES.find(x=>x.key===key); if(!d) return;
+  const ov = DO_['dtype.'+key]||{};
+  const flags = ov.flags!==undefined?ov.flags:d.flags;
+  const fields = [
+    {key:'flags', label:'Flags (comma-separated)', type:'text', value:(flags||[]).join(', ')},
+    {key:'impulse', label:'Impulse', type:'number', value: ov.impulse!==undefined?ov.impulse:d.impulse},
+    {key:'objx', label:'Objective ×', type:'number', value: ov.objx!==undefined?ov.objx:d.objx},
+    {key:'note', label:'Notes', type:'text', value: ov.note!==undefined?ov.note:d.note},
+  ];
+  openRowEditor('damage', 'dtype.'+key, `Damage Type — ${d.type}`, fields, false);
+}
+
+// ── Generic row editor shared by Ammo + Damage rows ───────────────────────
+let reCtx = null; // {kind:'ammo'|'damage', key, fields, allowDiscard}
+
+function getOverrideStore(kind){ return kind==='ammo' ? AO : DO_; }
+function saveOverrideStore(kind){ if(kind==='ammo') saveAmmoOverrides(); else saveDamageOverrides(); }
+
+function openRowEditor(kind, key, title, fields, allowDiscard){
+  if(!IS_ADMIN) return;
+  reCtx = {kind, key, fields, allowDiscard};
+  document.getElementById('re-title').textContent = title;
+  document.getElementById('re-body').innerHTML = fields.map(f=>`
+    <div class="re-field">
+      <div class="re-label">${esc(f.label)}</div>
+      <input class="re-input" data-key="${f.key}" type="${f.type==='number'?'number':'text'}" ${f.type==='number'?'step="any"':''} value="${f.value===undefined||f.value===null?'':esc(String(f.value))}">
+    </div>`).join('');
+  const ov = getOverrideStore(kind)[key];
+  document.getElementById('re-verified').checked = !!(ov && ov._verified);
+  document.getElementById('re-discard-btn').style.display = allowDiscard ? '' : 'none';
+  document.getElementById('row-edit-overlay').classList.add('open');
+}
+function closeRowEditor(){ document.getElementById('row-edit-overlay').classList.remove('open'); reCtx=null; }
+
+function saveRowEdit(){
+  if(!reCtx) return;
+  const {kind,key,fields} = reCtx;
+  const store = getOverrideStore(kind);
+  const ov = {...(store[key]||{})};
+  document.querySelectorAll('#re-body .re-input').forEach(inp=>{
+    const f = fields.find(x=>x.key===inp.dataset.key);
+    const raw = inp.value.trim();
+    if(f.key==='flags'){ ov.flags = raw ? raw.split(',').map(s=>s.trim()).filter(Boolean) : []; return; }
+    if(raw===''){ delete ov[f.key]; return; }
+    ov[f.key] = f.type==='number' ? parseFloat(raw) : raw;
+  });
+  ov._verified = document.getElementById('re-verified').checked;
+  delete ov._discarded;
+  const hasContent = Object.keys(ov).some(k=>k!=='_verified') || ov._verified;
+  if(!hasContent) delete store[key]; else store[key]=ov;
+  saveOverrideStore(kind);
+  closeRowEditor();
+  if(kind==='ammo') renderAmmoPage(); else renderDamagePage();
+}
+
+function discardRowEdit(){
+  if(!reCtx) return;
+  const {kind,key} = reCtx;
+  const store = getOverrideStore(kind);
+  store[key] = {_discarded:true};
+  saveOverrideStore(kind);
+  closeRowEditor();
+  if(kind==='ammo') renderAmmoPage(); else renderDamagePage();
+}
+
 // ── OVERRIDES (localStorage) ─────────────────────────────────────────────
 let WO = {};
 function loadOverrides(){ try{ WO=JSON.parse(localStorage.getItem('rspl2_overrides')||'{}'); }catch(e){ WO={}; } }
 function saveOverrides(){ localStorage.setItem('rspl2_overrides', JSON.stringify(WO)); }
 loadOverrides();
+
+// Ammo (AO) and Damage (DO) overrides — same pattern as WO, kept separate
+// since they apply to different data objects (AMMO_DATA/AMMO_LEGACY vs.
+// PLAYER_STATS/HITZONE_DATA/DAMAGE_TYPES).
+let AO = {};
+function loadAmmoOverrides(){ try{ AO=JSON.parse(localStorage.getItem('rspl2_ammo_overrides')||'{}'); }catch(e){ AO={}; } }
+function saveAmmoOverrides(){ localStorage.setItem('rspl2_ammo_overrides', JSON.stringify(AO)); }
+loadAmmoOverrides();
+
+let DO_ = {}; // player.<key> / hitzone.<key> / dtype.<key>
+function loadDamageOverrides(){ try{ DO_=JSON.parse(localStorage.getItem('rspl2_damage_overrides')||'{}'); }catch(e){ DO_={}; } }
+function saveDamageOverrides(){ localStorage.setItem('rspl2_damage_overrides', JSON.stringify(DO_)); }
+loadDamageOverrides();
 
 // Wrap buildWeaponInfo to apply overrides
 function buildWeaponInfoWithOverrides(weapons){
@@ -650,7 +900,7 @@ function diffClassCard(baseProps, newProps, side, role, baseWI, newWI, baseGI, n
         :`<td class="cost"><span style="color:#6a4010;text-decoration:line-through;font-size:10px;margin-right:3px">${g.bCost}</span><span style="color:#c08020">→${g.nCost}</span></td>`;
       const rowStyle=g.status==='added'?'background:#091508;':g.status==='removed'?'background:#150a0a;opacity:.6;':g.status==='changed'?'background:#1a1200;':'';
       const nameStyle=g.status==='removed'?'text-decoration:line-through;color:#703030':g.status==='added'?'color:#3a8050':'';
-      return `<tr data-bp="${g.bp}" data-diff-item="${g.status}" style="${rowStyle}cursor:pointer" onclick="openWeaponModal('${g.bp}')"><td class="wn">${gico?`<img src="${gico}" class="wi">`:"<span class='wi-ph'></span>"}<span style="${nameStyle}">${esc(name)}</span></td><td style="text-align:center;font-family:var(--mono);font-size:9px;font-weight:600;padding:5px 8px"><span style="background:${gc};padding:1px 5px;border-radius:2px;color:#ccc">${gt}</span></td>${costCell}<td class="stat">${weight||'—'}</td><td class="stat" style="font-size:10px;color:#444;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(desc)}</td></tr>`;
+      return `<tr data-bp="${g.bp}" data-diff-item="${g.status}" style="${rowStyle}cursor:pointer" onclick="openWeaponModal('${g.bp}')"><td class="wn">${gico?`<img src="${gico}" class="wi">`:"<span class='wi-ph'></span>"}<span style="${nameStyle}">${esc(name)}</span></td><td style="text-align:center;font-family:var(--mono);font-size:9px;font-weight:600;padding:5px 8px"><span style="background:${gc};padding:1px 5px;color:#ccc">${gt}</span></td>${costCell}<td class="stat">${weight||'—'}</td><td class="stat" style="font-size:10px;color:#444;max-width:200px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(desc)}</td></tr>`;
     }).join('');
     grenHtml=`<div class="gren-section"><table class="weapon-table" style="width:100%"><thead><tr><th class="left">Grenade</th><th>Type</th><th>$</th><th>Wt</th><th class="left">Description</th></tr></thead><tbody>${rows}</tbody></table></div>`;
   }
@@ -680,7 +930,7 @@ function renderDiff(baseData, newData){
   const bar=document.createElement('div');
   bar.id='diff-bar';
   bar.style.cssText='display:flex;align-items:center;gap:6px;padding:0 12px;height:32px;background:#0c0c0c;border-bottom:1px solid #1e1e1e;font-size:10px;font-family:var(--mono);flex-shrink:0;';
-  bar.innerHTML='<span id="db-add" style="padding:1px 7px;border-radius:3px;background:#0d2010;color:#3a8050;border:1px solid #162a1a;font-weight:600">— added</span><span id="db-rem" style="padding:1px 7px;border-radius:3px;background:#200d0d;color:#b03030;border:1px solid #2a1616;font-weight:600">— removed</span><span id="db-chg" style="padding:1px 7px;border-radius:3px;background:#1a1200;color:#907020;border:1px solid #2a2000;font-weight:600">— changed</span><span style="color:#333;margin-left:auto" id="db-same">— unchanged</span>';
+  bar.innerHTML='<span id="db-add" style="padding:1px 7px;background:#0d2010;color:#3a8050;border:1px solid #162a1a;font-weight:600">— added</span><span id="db-rem" style="padding:1px 7px;background:#200d0d;color:#b03030;border:1px solid #2a1616;font-weight:600">— removed</span><span id="db-chg" style="padding:1px 7px;background:#1a1200;color:#907020;border:1px solid #2a2000;font-weight:600">— changed</span><span style="color:#333;margin-left:auto" id="db-same">— unchanged</span>';
   document.querySelector('.main').insertAdjacentElement('beforebegin',bar);
 
   const insIcon=FACTION_ICONS.factionicon_insurgents||'';
@@ -752,6 +1002,9 @@ document.addEventListener('drop',e=>{
   const f=e.dataTransfer.files[0]; if(!f) return;
   const r=new FileReader(); r.onload=ev=>loadJSON(ev.target.result); r.readAsText(f);
 });
+
+renderAmmoPage();
+renderDamagePage();
 
 // ── AUTO-LOAD overrides.json ──────────────────────────────────────────────
 (async () => {
@@ -951,6 +1204,125 @@ function confirmPush(){
 }
 
 
+// ── WEAPON BALLISTICS (damage/pen vs. range) ───────────────────────────────
+// Real per-weapon distance curves: integrate the ammo's VelocityDecelerationCurve
+// (deceleration rate as a function of current retained velocity) starting from the
+// weapon's own muzzle velocity, then read damage/penetration off the ammo's
+// DamageCurve/PenetrationPowerCurve at that retained velocity. See AMMO_CURVES in
+// data.js for provenance/verification notes.
+function wdmLerp(v, keys) {
+  const t0 = keys[0][0], v0 = keys[0][1], t1 = keys[keys.length-1][0], v1 = keys[keys.length-1][1];
+  if (v <= t0) return v0;
+  if (v >= t1) return v1;
+  const frac = (v - t0) / (t1 - t0);
+  return v0 + frac * (v1 - v0);
+}
+
+function wdmCurveKeyFor(ammoKey) {
+  if (!ammoKey) return null;
+  if (AMMO_CURVES[ammoKey]) return ammoKey;
+  const base = ammoKey.replace('_Tracer', '');
+  if (AMMO_CURVES[base]) return base;
+  return null;
+}
+
+function wdmSimulateCurve(mvMs, curveKey) {
+  const curves = AMMO_CURVES[curveKey];
+  let v = mvMs * 100; // cm/s
+  let x = 0;
+  const dt = 0.0001;
+  const samples = [{range:0, dmg:wdmLerp(v,curves.dmg), pen:wdmLerp(v,curves.pen)}];
+  const stepM = 5;
+  let nextTarget = stepM;
+  let iter = 0;
+  const maxIter = 400000;
+  const floorV = curves.vel[0][0];
+  while (iter++ < maxIter) {
+    const a = wdmLerp(v, curves.vel);
+    if (v <= floorV && a <= 0) break;
+    v = Math.max(v - a * dt, 0);
+    x += v * dt;
+    while (x >= nextTarget * 100) {
+      samples.push({range: nextTarget, dmg: wdmLerp(v,curves.dmg), pen: wdmLerp(v,curves.pen)});
+      nextTarget += stepM;
+      if (nextTarget > 1600) return samples;
+    }
+  }
+  const lastRange = samples[samples.length-1].range;
+  const plateauEnd = Math.ceil((lastRange+40)/50)*50;
+  for (let r = nextTarget; r <= plateauEnd; r += stepM) {
+    samples.push({range: r, dmg: wdmLerp(v,curves.dmg), pen: wdmLerp(v,curves.pen)});
+  }
+  return samples;
+}
+
+function wdmBuildChart(hostEl, sim, field) {
+  const svg = hostEl.querySelector('svg.wdm-chart');
+  svg.innerHTML = '';
+  const maxRange = sim[sim.length-1].range;
+  const maxVal = Math.max(...sim.map(p=>p[field])) * 1.1;
+  const X = r => (r/maxRange)*100;
+  const Y = v => 40 - (v/maxVal)*36 - 2;
+
+  for (let i=0;i<=3;i++){
+    const y = 2+i*12;
+    const gl = document.createElementNS('http://www.w3.org/2000/svg','line');
+    gl.setAttribute('x1',0); gl.setAttribute('x2',100); gl.setAttribute('y1',y); gl.setAttribute('y2',y);
+    gl.setAttribute('class','wdm-chart-grid');
+    svg.appendChild(gl);
+  }
+  [0,0.5,1].forEach(frac=>{
+    const x = frac*100;
+    const t = document.createElementNS('http://www.w3.org/2000/svg','text');
+    t.setAttribute('x', frac===1 ? 96 : x); t.setAttribute('y', 39.5);
+    t.setAttribute('class','wdm-chart-axis');
+    t.setAttribute('text-anchor', frac===1 ? 'end' : 'start');
+    t.textContent = Math.round(frac*maxRange)+'m';
+    svg.appendChild(t);
+  });
+
+  const pts = sim.map(p=>[X(p.range), Y(p[field])]);
+  const poly = document.createElementNS('http://www.w3.org/2000/svg','polyline');
+  poly.setAttribute('points', pts.map(p=>p.join(',')).join(' '));
+  poly.setAttribute('class','wdm-chart-line');
+  svg.appendChild(poly);
+
+  const crosshair = document.createElementNS('http://www.w3.org/2000/svg','line');
+  crosshair.setAttribute('y1',0); crosshair.setAttribute('y2',40);
+  crosshair.setAttribute('class','wdm-chart-crosshair');
+  svg.appendChild(crosshair);
+  const dot = document.createElementNS('http://www.w3.org/2000/svg','circle');
+  dot.setAttribute('class','wdm-chart-dot');
+  svg.appendChild(dot);
+
+  const tip = hostEl.querySelector('.wdm-chart-tip');
+  tip.style.display = 'none';
+  hostEl.onmousemove = (e) => {
+    const rect = hostEl.getBoundingClientRect();
+    const frac = Math.min(Math.max((e.clientX-rect.left)/rect.width,0),1);
+    const idx = Math.round(frac*(sim.length-1));
+    crosshair.setAttribute('x1',pts[idx][0]); crosshair.setAttribute('x2',pts[idx][0]);
+    crosshair.style.display = 'block';
+    dot.setAttribute('cx',pts[idx][0]); dot.setAttribute('cy',pts[idx][1]);
+    dot.style.display = 'block';
+    tip.textContent = `${sim[idx].range}m — ${sim[idx][field].toFixed(1)}`;
+    tip.style.display = 'block';
+    tip.style.left = Math.min(e.clientX-rect.left+8, rect.width-100)+'px';
+    tip.style.top = Math.max(e.clientY-rect.top-26,2)+'px';
+  };
+  hostEl.onmouseleave = () => {
+    crosshair.style.display = 'none';
+    dot.style.display = 'none';
+    tip.style.display = 'none';
+  };
+}
+
+function wdmRenderCharts(mvMs, curveKey) {
+  const sim = wdmSimulateCurve(mvMs, curveKey);
+  wdmBuildChart(document.getElementById('wdm-chart-dmg'), sim, 'dmg');
+  wdmBuildChart(document.getElementById('wdm-chart-pen'), sim, 'pen');
+}
+
 // ── WEAPON DETAIL MODAL ───────────────────────────────────────────────────
 function openWeaponModal(bp) {
   const wi = (currentData && currentData.weapons) || BAKED_DATA.weapons || {};
@@ -958,7 +1330,7 @@ function openWeaponModal(bp) {
   const ov = WO[bp] || {};
 
   const name = ov.name || wdata.item_name || bp.replace('BP_Firearm_','').replace('BP_Grenade_','');
-  const ammoKey = ov.ammo || wdata._ammo_override || '';
+  const ammoKey = ov.ammo || wdata._ammo_override || (WEAPON_DAMAGE[bp] ? WEAPON_DAMAGE[bp].ammo : '') || '';
   const modes = ov.modes || wdata._modes_override || extractModes(wdata.weapon_config);
   const muzzle = ov.muzzle || wdata._muzzle_override || extractNum(wdata.weapon_config, 'muzzle_velocity');
   const rpmVal = ov.rpm || wdata._rpm_override || calcRPM(wdata.weapon_config);
@@ -978,9 +1350,26 @@ function openWeaponModal(bp) {
   let ammoBanner = '';
   let dmgHtml = '';
   let statsRows = '';
+  let chartHtml = '';
+  let chartData = null;
 
   if (a) {
     const mv = muzzle || (wd ? wd.mv : null);
+    const curveKey = wdmCurveKeyFor((wd ? wd.ammo : null) || ammoKey);
+    if (mv && curveKey) {
+      chartData = {mv, curveKey};
+      chartHtml = `
+        <div class="wdm-section-title">Damage vs. Range</div>
+        <div class="wdm-chart-panel"><div class="wdm-chart-host" id="wdm-chart-dmg">
+          <svg class="wdm-chart" viewBox="0 0 100 40" preserveAspectRatio="none"></svg>
+          <div class="wdm-chart-tip"></div>
+        </div></div>
+        <div class="wdm-section-title">Penetration Power vs. Range</div>
+        <div class="wdm-chart-panel"><div class="wdm-chart-host" id="wdm-chart-pen">
+          <svg class="wdm-chart" viewBox="0 0 100 40" preserveAspectRatio="none"></svg>
+          <div class="wdm-chart-tip"></div>
+        </div></div>`;
+    }
     const dmgClose = (wd ? wd.dmg : null) || a.dmg_close;
     const dmgLong = a.dmg_long;
     const pellets = (wd ? wd.pellets : null) || a.pellets || 1;
@@ -1056,9 +1445,14 @@ function openWeaponModal(bp) {
     ${ammoBanner}
     ${dmgHtml}
     ${statsRows ? `<div class="wdm-rows">${statsRows}</div>` : ''}
+    ${chartHtml}
     ${reloadHtml}
     ${ammoChips}
   `;
+
+  if (chartData) {
+    wdmRenderCharts(chartData.mv, chartData.curveKey);
+  }
 
   const editCol = document.getElementById('wdm-edit');
   if (IS_ADMIN) {
@@ -1159,6 +1553,10 @@ async function doPush(){
       if (ov.icon !== undefined) mergedData.weapons[bp]._icon_override = ov.icon;
     }
   }
+  // Include ammo/damage review overrides (AO/DO_) so corrections made in the
+  // Ammo and Damage page editors are backed up alongside weapon overrides.
+  if (Object.keys(AO).length) mergedData._ammo_overrides = AO;
+  if (Object.keys(DO_).length) mergedData._damage_overrides = DO_;
   const content = btoa(unescape(encodeURIComponent(JSON.stringify(mergedData, null, 2))));
   const apiBase = `https://api.github.com/repos/${GH_REPO}/contents/${GH_FILE}`;
 
@@ -1257,6 +1655,22 @@ async function doPush(){
     <div class="btn-row">
       <button onclick="document.getElementById('push-confirm').classList.remove('show')">Cancel</button>
       <button class="primary" onclick="doPush()">Confirm Push</button>
+    </div>
+  </div>
+</div>
+
+<div id="row-edit-overlay" onclick="if(event.target===this)closeRowEditor()">
+  <div id="row-edit-box">
+    <div id="re-header">
+      <div id="re-title"></div>
+      <button id="re-close" onclick="closeRowEditor()">✕</button>
+    </div>
+    <div id="re-body"></div>
+    <div id="re-footer">
+      <label id="re-verify-row"><input type="checkbox" id="re-verified"> Verified</label>
+      <div style="flex:1"></div>
+      <button class="ep-btn ep-reset" id="re-discard-btn" onclick="discardRowEdit()" style="display:none;flex:none;padding:6px 10px">Discard</button>
+      <button class="ep-btn ep-save" onclick="saveRowEdit()" style="flex:none;padding:6px 14px">Save</button>
     </div>
   </div>
 </div>
